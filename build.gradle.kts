@@ -84,7 +84,7 @@ compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "EZLedger"
             packageVersion = "1.0.0"
             description = "EZLedger - Secure Financial Management"
@@ -92,11 +92,29 @@ compose.desktop {
             vendor = "YOTTA Systems"
             
             windows {
-                iconFile.set(project.file("src/main/resources/icon.ico"))
+                iconFile.set(project.file("icon.ico"))
                 menuGroup = "YOTTA"
                 perUserInstall = true
                 dirChooser = true
                 upgradeUuid = "12345678-1234-1234-1234-123456789012"
+                // Additional jpackage options for better Windows integration
+                packageVersion = "1.0.0"
+                msiPackageVersion = "1.0.0"
+                exePackageVersion = "1.0.0"
+            }
+            
+            macOS {
+                iconFile.set(project.file("icon.ico"))
+                bundleID = "com.yotta.ezledger"
+                appCategory = "public.app-category.finance"
+            }
+            
+            linux {
+                iconFile.set(project.file("icon.ico"))
+                packageName = "ezledger"
+                debMaintainer = "support@yotta-systems.com"
+                menuGroup = "Office"
+                appCategory = "Office"
             }
         }
     }
@@ -136,6 +154,39 @@ tasks.register("buildSecureJar") {
         if (sourceFile.exists()) {
             sourceFile.copyTo(targetFile, overwrite = true)
             println("Created obfuscated JAR: ${targetFile.absolutePath}")
+        } else {
+            throw GradleException("Source JAR not found: ${sourceFile.absolutePath}")
+        }
+    }
+}
+
+// Native executable tasks
+tasks.register("buildWindowsExe") {
+    group = "distribution"
+    description = "Build Windows .exe using Compose Desktop"
+    dependsOn("packageExe")
+}
+
+tasks.register("buildAllNativeDistributions") {
+    group = "distribution"
+    description = "Build all native distributions (Windows .exe, macOS .dmg, Linux .deb)"
+    dependsOn("packageDistributionForCurrentOS")
+}
+
+// Task to prepare JAR for jpackage
+tasks.register("prepareJarForJpackage") {
+    group = "distribution"
+    description = "Prepare JAR file for jpackage with correct naming"
+    dependsOn("shadowJar")
+    doLast {
+        val sourceFile = File("build/libs/EZLedger-1.0.0-all.jar")
+        val targetDir = File("build/jpackage-input")
+        val targetFile = File(targetDir, "EZLedger-1.0.0-all.jar")
+        
+        targetDir.mkdirs()
+        if (sourceFile.exists()) {
+            sourceFile.copyTo(targetFile, overwrite = true)
+            println("JAR prepared for jpackage: ${targetFile.absolutePath}")
         } else {
             throw GradleException("Source JAR not found: ${sourceFile.absolutePath}")
         }
