@@ -1,0 +1,77 @@
+name: Build Windows Installers
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Application version'
+        required: false
+        default: '1.0.0'
+        type: string
+
+jobs:
+  build:
+    name: Build Windows Installers
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+      
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      
+      - name: Build with Gradle
+        run: ./gradlew buildSecureJar
+      
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Build Secure Windows Distribution
+        run: |
+          chmod +x ./build-secure-windows.sh
+          ./build-secure-windows.sh
+      
+      - name: Build MSI Installer
+        run: |
+          chmod +x ./build-msi-installer.sh
+          ./build-msi-installer.sh
+      
+      - name: Build NSIS Installer
+        run: |
+          chmod +x ./build-nsis-installer.sh
+          ./build-nsis-installer.sh
+      
+      - name: Upload MSI Installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: msi-installer
+          path: msi-dist/*.msi
+          retention-days: 7
+      
+      - name: Upload EXE Installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: exe-installer
+          path: installer-dist/*.exe
+          retention-days: 7
+      
+      - name: Upload Portable Distribution
+        uses: actions/upload-artifact@v3
+        with:
+          name: portable-distribution
+          path: |
+            secure-dist/EZLedger-Secure-Windows.zip
+            secure-dist/EZLedger-Secure-Windows.tar.gz
+          retention-days: 7

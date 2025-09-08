@@ -1,0 +1,490 @@
+# Multi-stage Dockerfile for creating secure Windows executable with embedded JRE
+# Stage 1: Build the application with ProGuard obfuscation
+FROM openjdk:17-jdk-slim as builder
+
+# Install required tools
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    binutils \
+    zip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy Gradle files
+COPY build.gradle.kts settings.gradle.kts gradle.properties ./
+COPY gradle/ ./gradle/
+COPY gradlew ./
+
+# Copy source code
+COPY src/ ./src/
+
+# Copy ProGuard configuration
+COPY proguard-rules.pro obfuscation-dictionary.txt ./
+
+# Make gradlew executable
+RUN chmod +x ./gradlew
+
+# Build the obfuscated JAR
+RUN ./gradlew buildSecureJar --no-daemon
+
+# Verify the obfuscated JAR was created
+RUN ls -la build/libs/ && test -f build/libs/EZLedger-1.0.0-obfuscated.jar
+
+# Download Windows JRE for cross-platform compatibility
+RUN wget -O windows-jre.zip "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jre_x64_windows_hotspot_17.0.12_7.zip" && \
+    unzip windows-jre.zip && \
+    mv jdk-17.0.12+7-jre /app/jre-windows && \
+    rm windows-jre.zip
+
+# Stage 2: Create Windows application structure
+FROM alpine:latest as packager
+
+# Install required tools
+RUN apk add --no-cache zip openjdk17
+
+# Set working directory
+WORKDIR /dist
+
+# Copy obfuscated JAR and Windows JRE from builder
+COPY --from=builder /app/build/libs/EZLedger-1.0.0-obfuscated.jar ./app.jar
+COPY --from=builder /app/jre-windows ./jre/
+
+# Create Java wrapper for Windows
+COPY <<EOF ./EZLedger.java
+import security.AntiTamperingProtection;
+
+public class EZLedger {
+    public static void main(String[] args) {
+        try {
+            // Initialize anti-tampering protection
+            AntiTamperingProtection.INSTANCE.initialize();
+            
+            // Add security checks
+            performSecurityChecks();
+            
+            // Launch main application
+            Class<?> mainClass = Class.forName("MainKt");
+            java.lang.reflect.Method mainMethod = mainClass.getMethod("main", String[].class);
+            mainMethod.invoke(null, (Object) args);
+            
+        } catch (Exception e) {
+            System.err.println("Application startup failed");
+            System.exit(1);
+        }
+    }
+    
+    private static void performSecurityChecks() {
+        // Check if running in expected environment
+        String osName = System.getProperty("os.name", "").toLowerCase();
+        if (!osName.contains("windows")) {
+            System.err.println("Unsupported operating system");
+            System.exit(1);
+        }
+        
+        // Check Java version
+        String javaVersion = System.getProperty("java.version", "");
+        if (!javaVersion.startsWith("17")) {
+            System.err.println("Unsupported Java version");
+            System.exit(1);
+        }
+    }
+}
+EOF
+
+# List contents to debug
+RUN ls -la /dist/jre/bin/ || echo "JRE bin directory not found"
+
+# Compile Java wrapper with the JAR in classpath using system javac
+RUN javac -cp app.jar EZLedger.java
+
+# Create Windows batch launcher with advanced features
+COPY <<EOF ./EZLedger.bat
+@echo off
+setlocal enabledelayedexpansion
+
+REM EZLedger - Secure Windows Launcher
+REM Copyright (c) 2024 EZ Systems
+
+REM Set application directory
+set "APP_DIR=%~dp0"
+set "JRE_DIR=%APP_DIR%jre\"
+set "APP_JAR=%APP_DIR%app.jar"
+set "WRAPPER_CLASS=%APP_DIR%EZLedger.class"
+
+REM Check if JRE exists
+if not exist "%JRE_DIR%bin\java.exe" (
+    echo Error: Java Runtime Environment not found!
+    echo Please ensure the application is properly installed.
+    pause
+    exit /b 1
+)
+
+REM Check if application JAR exists
+if not exist "%APP_JAR%" (
+    echo Error: Application files not found!
+    echo Please reinstall the application.
+    pause
+    exit /b 1
+)
+
+REM Check if wrapper class exists
+if not exist "%WRAPPER_CLASS%" (
+    echo Error: Application wrapper not found!
+    echo Please reinstall the application.
+    pause
+    exit /b 1
+)
+
+REM Set security properties
+set "SECURITY_PROPS=-Djava.security.manager=default"
+set "SECURITY_PROPS=%SECURITY_PROPS% -Djava.security.policy=all.policy"
+set "SECURITY_PROPS=%SECURITY_PROPS% -Dfile.encoding=UTF-8"
+
+REM Set JVM options for security and performance
+set "JVM_OPTS=-Xms256m -Xmx1024m"
+set "JVM_OPTS=%JVM_OPTS% -XX:+UseG1GC"
+set "JVM_OPTS=%JVM_OPTS% -XX:+DisableAttachMechanism"
+set "JVM_OPTS=%JVM_OPTS% -Dcom.sun.management.jmxremote=false"
+set "JVM_OPTS=%JVM_OPTS% -Djava.awt.headless=false"
+
+REM Launch application with security wrapper
+echo Starting EZLedger...
+"%JRE_DIR%bin\java.exe" %JVM_OPTS% %SECURITY_PROPS% -cp "%APP_JAR%;%APP_DIR%" EZLedger %*
+
+REM Check exit code
+if %ERRORLEVEL% neq 0 (
+    echo.
+    echo Application exited with error code: %ERRORLEVEL%
+    echo Please check the logs for more information.
+    pause
+)
+
+endlocal
+EOF
+
+# Create PowerShell launcher as alternative
+COPY <<EOF ./EZLedger.ps1
+# EZLedger - Secure PowerShell Launcher
+# Copyright (c) 2024 EZ Systems
+
+param(
+    [string[]]\$Arguments = @()
+)
+
+# Set error handling
+\$ErrorActionPreference = "Stop"
+
+try {
+    # Get application directory
+    \$AppDir = Split-Path -Parent \$MyInvocation.MyCommand.Path
+    \$JreDir = Join-Path \$AppDir "jre"
+    \$AppJar = Join-Path \$AppDir "app.jar"
+    \$WrapperClass = Join-Path \$AppDir "EZLedger.class"
+    \$JavaExe = Join-Path \$JreDir "bin\java.exe"
+    
+    # Verify required files exist
+    if (-not (Test-Path \$JavaExe)) {
+        throw "Java Runtime Environment not found at: \$JavaExe"
+    }
+    
+    if (-not (Test-Path \$AppJar)) {
+        throw "Application JAR not found at: \$AppJar"
+    }
+    
+    if (-not (Test-Path \$WrapperClass)) {
+        throw "Application wrapper not found at: \$WrapperClass"
+    }
+    
+    # Set security and JVM options
+    \$SecurityProps = @(
+        "-Djava.security.manager=default",
+        "-Djava.security.policy=all.policy",
+        "-Dfile.encoding=UTF-8"
+    )
+    
+    \$JvmOpts = @(
+        "-Xms256m",
+        "-Xmx1024m",
+        "-XX:+UseG1GC",
+        "-XX:+DisableAttachMechanism",
+        "-Dcom.sun.management.jmxremote=false",
+        "-Djava.awt.headless=false"
+    )
+    
+    # Prepare classpath
+    \$ClassPath = "\$AppJar;\$AppDir"
+    
+    # Prepare arguments
+    \$JavaArgs = \$JvmOpts + \$SecurityProps + @("-cp", \$ClassPath, "EZLedger") + \$Arguments
+    
+    # Launch application
+    Write-Host "Starting EZLedger..." -ForegroundColor Green
+    \$Process = Start-Process -FilePath \$JavaExe -ArgumentList \$JavaArgs -Wait -PassThru -NoNewWindow
+    
+    # Check exit code
+    if (\$Process.ExitCode -ne 0) {
+        Write-Host "Application exited with error code: \$\(\$Process.ExitCode\)" -ForegroundColor Red
+        Write-Host "Please check the logs for more information." -ForegroundColor Yellow
+        Read-Host "Press Enter to continue"
+    }
+    
+} catch {
+    Write-Host "Error: \$\(\$_.Exception.Message\)" -ForegroundColor Red
+    Read-Host "Press Enter to continue"
+    exit 1
+}
+EOF
+
+# Create installation script
+COPY <<EOF ./install.bat
+@echo off
+setlocal enabledelayedexpansion
+
+REM EZLedger Installation Script
+REM Copyright (c) 2024 EZ Systems
+
+echo ========================================
+echo EZLedger Installation
+echo ========================================
+echo.
+
+REM Check for administrator privileges
+net session >nul 2>&1
+if %%errorLevel%% == 0 (
+    echo Running with administrator privileges...
+    set "INSTALL_MODE=admin"
+) else (
+    echo Running in user mode...
+    set "INSTALL_MODE=user"
+)
+
+REM Set installation directory based on privileges
+if "%%INSTALL_MODE%%"=="admin" (
+    set "INSTALL_DIR=%%ProgramFiles%%\EZ\EZLedger"
+) else (
+    set "INSTALL_DIR=%%USERPROFILE%%\AppData\Local\EZ\EZLedger"
+)
+
+echo Installation directory: %%INSTALL_DIR%%
+echo.
+
+REM Create installation directory
+if not exist "%%INSTALL_DIR%%" (
+    echo Creating installation directory...
+    mkdir "%%INSTALL_DIR%%" 2>nul
+    if %%errorlevel%% neq 0 (
+        echo Error: Failed to create installation directory!
+        echo Please run as administrator or choose a different location.
+        pause
+        exit /b 1
+    )
+)
+
+REM Copy application files
+echo Copying application files...
+xcopy /E /I /Y "." "%%INSTALL_DIR%%" >nul
+if %%errorlevel%% neq 0 (
+    echo Error: Failed to copy application files!
+    pause
+    exit /b 1
+)
+
+REM Create desktop shortcut
+echo Creating desktop shortcut...
+set "SHORTCUT_PATH=%%USERPROFILE%%\Desktop\EZLedger.lnk"
+powershell -Command "\$WshShell = New-Object -comObject WScript.Shell; \$Shortcut = \$WshShell.CreateShortcut('%%SHORTCUT_PATH%%'); \$Shortcut.TargetPath = '%%INSTALL_DIR%%\EZLedger.bat'; \$Shortcut.WorkingDirectory = '%%INSTALL_DIR%%'; \$Shortcut.Description = 'EZLedger - Secure Financial Management'; \$Shortcut.Save()"
+
+REM Create Start Menu shortcut
+if "%%INSTALL_MODE%%"=="admin" (
+    set "STARTMENU_DIR=%%ProgramData%%\Microsoft\Windows\Start Menu\Programs\EZ"
+) else (
+    set "STARTMENU_DIR=%%APPDATA%%\Microsoft\Windows\Start Menu\Programs\EZ"
+)
+
+if not exist "%%STARTMENU_DIR%%" mkdir "%%STARTMENU_DIR%%"
+set "STARTMENU_SHORTCUT=%%STARTMENU_DIR%%\EZLedger.lnk"
+if not exist "%%STARTMENU_DIR%%" mkdir "%%STARTMENU_DIR%%"
+powershell -Command "\$WshShell = New-Object -comObject WScript.Shell; \$Shortcut = \$WshShell.CreateShortcut('%%STARTMENU_SHORTCUT%%'); \$Shortcut.TargetPath = '%%INSTALL_DIR%%\EZLedger.bat'; \$Shortcut.WorkingDirectory = '%%INSTALL_DIR%%'; \$Shortcut.Description = 'EZLedger - Secure Financial Management'; \$Shortcut.Save()"
+
+REM Register uninstaller
+echo Registering uninstaller...
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\EZLedger" /v "DisplayName" /t REG_SZ /d "EZLedger" /f >nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\EZLedger" /v "DisplayVersion" /t REG_SZ /d "1.0.0" /f >nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\EZLedger" /v "Publisher" /t REG_SZ /d "EZ Systems" /f >nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\EZLedger" /v "InstallLocation" /t REG_SZ /d "%%INSTALL_DIR%%" /f >nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\EZLedger" /v "UninstallString" /t REG_SZ /d "\"%%INSTALL_DIR%%\uninstall.bat\"" /f >nul
+
+REM Create uninstaller
+echo Creating uninstaller...
+(
+echo @echo off
+echo echo Uninstalling EZLedger...
+echo rd /s /q "%%INSTALL_DIR%%"
+echo del "%%USERPROFILE%%\Desktop\EZLedger.lnk" 2^>nul
+echo rd /s /q "%%STARTMENU_DIR%%" 2^>nul
+echo reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\EZLedger" /f 2^>nul
+echo echo EZLedger has been uninstalled.
+echo pause
+) > "%%INSTALL_DIR%%\uninstall.bat"
+
+echo.
+echo ========================================
+echo Installation completed successfully!
+echo ========================================
+echo.
+echo Application installed to: %%INSTALL_DIR%%
+echo Desktop shortcut created: %%SHORTCUT_PATH%%
+echo Start Menu shortcut created: %%STARTMENU_SHORTCUT%%
+echo.
+echo You can now launch EZLedger from:
+echo - Desktop shortcut
+echo - Start Menu
+echo - Command: "%%INSTALL_DIR%%\EZLedger.bat"
+echo.
+echo To uninstall, run: "%%INSTALL_DIR%%\uninstall.bat"
+echo.
+pause
+endlocal
+EOF
+
+# Create README file
+COPY <<EOF ./README.txt
+EZLedger - Secure Financial Management Application
+=====================================================
+
+Version: 1.0.0
+Copyright (c) 2024 EZ Systems
+
+SYSTEM REQUIREMENTS
+==================
+- Windows 10 or later (64-bit)
+- 4 GB RAM minimum (8 GB recommended)
+- 500 MB free disk space
+- No Java installation required (embedded JRE included)
+
+INSTALLATION OPTIONS
+===================
+
+1. AUTOMATIC INSTALLATION (Recommended)
+   - Run install.bat as Administrator for system-wide installation
+   - Run install.bat as regular user for user-only installation
+   - Creates desktop and Start Menu shortcuts automatically
+   - Registers with Windows Add/Remove Programs
+
+2. PORTABLE MODE
+   - Extract files to any directory
+   - Run EZLedger.bat directly
+   - No installation required
+   - No registry modifications
+
+3. COMMAND LINE USAGE
+   - Open Command Prompt or PowerShell
+   - Navigate to application directory
+   - Run: EZLedger.bat [arguments]
+- Or: powershell -ExecutionPolicy Bypass -File EZLedger.ps1 [arguments]
+
+LAUNCHERS
+=========
+
+1. EZLedger.bat
+   - Windows Batch launcher
+   - Includes comprehensive error checking
+   - Automatic JRE detection
+   - Security hardening
+
+2. EZLedger.ps1
+   - PowerShell launcher
+   - Enhanced error handling
+   - Better argument processing
+   - Modern Windows integration
+
+SECURITY FEATURES
+================
+
+- Code obfuscation with ProGuard
+- Anti-tampering protection
+- Debugger detection
+- Runtime integrity checks
+- Embedded JRE (no external Java dependency)
+- Security manager enforcement
+- Memory protection mechanisms
+
+FILES INCLUDED
+=============
+
+- app.jar                 : Obfuscated application (84MB)
+- EZLedger.class         : Security wrapper
+- EZLedger.bat           : Windows batch launcher
+- EZLedger.ps1           : PowerShell launcher
+- install.bat            : Installation script
+- uninstall.bat          : Uninstallation script (created during install)
+- jre/                   : Embedded Java Runtime Environment (50MB)
+- README.txt             : This file
+
+TROUBLESHOOTING
+==============
+
+Problem: Application won't start
+Solution: 
+- Ensure all files are in the same directory
+- Check Windows Defender/antivirus exclusions
+- Run as Administrator if needed
+- Verify Windows version compatibility
+
+Problem: "Java not found" error
+Solution:
+- Verify jre/ directory exists and contains Java files
+- Re-extract/reinstall the application
+- Check file permissions
+
+Problem: Security warnings
+Solution:
+- Add application directory to antivirus exclusions
+- Verify file integrity
+- Download from official source only
+
+Problem: Performance issues
+Solution:
+- Ensure minimum 4GB RAM available
+- Close unnecessary applications
+- Check disk space (minimum 500MB free)
+- Update Windows to latest version
+
+SUPPORT
+=======
+
+For technical support and updates:
+- Website: https://ez-systems.com
+- Email: support@ez-systems.com
+- Documentation: https://docs.ez-systems.com
+
+LICENSE
+=======
+
+This software is proprietary and confidential.
+Unauthorized copying, distribution, or reverse engineering is prohibited.
+See license agreement for full terms and conditions.
+
+CHANGELOG
+=========
+
+Version 1.0.0 (Initial Release)
+- Secure financial management features
+- Advanced anti-tampering protection
+- Self-contained Windows deployment
+- Comprehensive installation system
+- Multiple launcher options
+EOF
+
+# Create final distribution archives
+RUN zip -r EZLedger-Secure-Windows.zip . && \
+    tar -czf EZLedger-Secure-Windows.tar.gz . && \
+    echo "EZLedger Secure Windows Distribution created successfully!"
+
+# Final stage: Output
+FROM alpine:latest as output
+RUN apk add --no-cache bash
+COPY --from=packager /dist/ /
