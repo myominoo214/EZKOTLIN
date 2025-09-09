@@ -90,9 +90,8 @@ compose.desktop {
             description = "EZLedger - Secure Financial Management"
             copyright = "© 2024 YOTTA Systems"
             vendor = "YOTTA Systems"
-            
+            jvmHome = "C:/Program Files/Amazon Corretto/jdk17.0.16_8"
             windows {
-                jvmHome = "C:/Program Files/Amazon Corretto/jdk17.0.16_8"
                 includeAllModules = true  // bundle JRE + Skiko
                 iconFile.set(project.file("src/main/resources/icon.ico"))
                 menuGroup = "YOTTA"
