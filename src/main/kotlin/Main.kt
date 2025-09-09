@@ -55,7 +55,7 @@ fun main() {
     
     Window(
         onCloseRequest = { showExitDialog = true },
-        title = "Yotta",
+        title = "EZ Ledger",
         state = WindowState(placement = WindowPlacement.Maximized)
     ) {
         App()

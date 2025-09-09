@@ -129,7 +129,7 @@ compose.desktop {
             vendor = "YOTTA Systems"
             
             windows {
-                iconFile.set(project.file("icon.ico"))
+                iconFile.set(project.file("src/main/resources/icon.ico"))
                 menuGroup = "YOTTA"
                 perUserInstall = true
                 dirChooser = true
@@ -156,7 +156,7 @@ gh workflow run "Build Windows Installers" -f version=2.0.0
    ```
 
 2. **Missing icon.ico**
-   - Ensure `icon.ico` exists in project root
+   - Ensure `icon.ico` exists in `src/main/resources/` folder
    - Or update `iconFile.set()` path in build.gradle.kts
 
 3. **jpackage not found**

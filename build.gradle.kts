@@ -106,13 +106,13 @@ compose.desktop {
             }
             
             macOS {
-                iconFile.set(project.file("icon.ico"))
+                iconFile.set(project.file("src/main/resources/icon.ico"))
                 bundleID = "com.yotta.ezledger"
                 appCategory = "public.app-category.finance"
             }
             
             linux {
-                iconFile.set(project.file("icon.ico"))
+                iconFile.set(project.file("src/main/resources/icon.ico"))
                 packageName = "ezledger"
                 debMaintainer = "support@yotta-systems.com"
                 menuGroup = "Office"
