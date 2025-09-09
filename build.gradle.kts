@@ -92,12 +92,12 @@ compose.desktop {
             vendor = "YOTTA Systems"
             
             windows {
-                arch = listOf("x64")
                 includeAllModules = true  // bundle JRE + Skiko
                 iconFile.set(project.file("src/main/resources/icon.ico"))
                 menuGroup = "YOTTA"
                 perUserInstall = true
                 dirChooser = true
+                shortcut = true  // Create desktop shortcut
                 upgradeUuid = "12345678-1234-1234-1234-123456789012"
                 // Additional jpackage options for better Windows integration
                 packageVersion = "1.0.0"
