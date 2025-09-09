@@ -92,7 +92,9 @@ compose.desktop {
             vendor = "YOTTA Systems"
             
             windows {
-                iconFile.set(project.file("icon.ico"))
+                arch = listOf("x64")
+                includeAllModules = true  // bundle JRE + Skiko
+                iconFile.set(project.file("src/main/resources/icon.ico"))
                 menuGroup = "YOTTA"
                 perUserInstall = true
                 dirChooser = true
