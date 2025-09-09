@@ -92,9 +92,11 @@ compose.desktop {
             vendor = "YOTTA Systems"
              
             windows {
-                jpackage {
-                    javaHome = "C:/Program Files/Amazon Corretto/jdk17.0.16_8"
-                }
+                // Set the JDK used by jpackage
+                jvmArgs = listOf(
+                    "--module-path", "C:/Program Files/Amazon Corretto/jdk17.0.16_8/lib",
+                    "--add-modules", "java.base"
+                )
                 includeAllModules = true  // bundle JRE + Skiko
                 iconFile.set(project.file("src/main/resources/icon.ico"))
                 menuGroup = "YOTTA"
