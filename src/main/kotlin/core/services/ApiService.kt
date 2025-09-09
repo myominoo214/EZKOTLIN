@@ -109,6 +109,10 @@ class ApiService {
     }
     
     val client = HttpClient(CIO) {
+        engine {
+            pipelining = true  // Enable HTTP pipelining for parallel API calls
+        }
+        
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true
