@@ -480,6 +480,54 @@ fun formatDateTime(dateTimeString: String): String {
     }
 }
 
+// Format date to DD format for shortName
+fun formatDateToDD(dateString: String): String {
+    return try {
+        val date = LocalDate.parse(dateString)
+        val formatter = DateTimeFormatter.ofPattern("dd")
+        date.format(formatter)
+    } catch (e: Exception) {
+        println("Error formatting date to DD: ${e.message}")
+        dateString
+    }
+}
+
+// Format date to DD/MM/YYYY format for termName
+fun formatDateToDDMMYYYY(dateString: String): String {
+    return try {
+        val date = LocalDate.parse(dateString)
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        date.format(formatter)
+    } catch (e: Exception) {
+        println("Error formatting date to DD/MM/YYYY: ${e.message}")
+        dateString
+    }
+}
+
+// Format time from HH:mm to HH A format for shortName
+fun formatTimeToHHA(timeString: String): String {
+    return try {
+        val time = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm"))
+        val formatter = DateTimeFormatter.ofPattern("HH a", Locale.ENGLISH)
+        time.format(formatter)
+    } catch (e: Exception) {
+        println("Error formatting time to HH A: ${e.message}")
+        timeString
+    }
+}
+
+// Format time from HH:mm to HH:mm A format for termName
+fun formatTimeToHHMMA(timeString: String): String {
+    return try {
+        val time = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm"))
+        val formatter = DateTimeFormatter.ofPattern("HH:mm a", Locale.ENGLISH)
+        time.format(formatter)
+    } catch (e: Exception) {
+        println("Error formatting time to HH:mm A: ${e.message}")
+        timeString
+    }
+}
+
 @Composable
 fun TermsContent() {
     var terms by remember { mutableStateOf<List<TermData>>(emptyList()) }
@@ -852,11 +900,29 @@ fun TermsContent() {
                                 val formattedStartDateTime = formatDateTimeToMyanmarTimezone(startDateTime)
                                 val formattedEndDateTime = formatDateTimeToMyanmarTimezone(endDateTime)
                                 
+                                // Format termName and shortName according to the specified pattern
+                                val dayFormatted = formatDateToDD(day)
+                                val dayFullFormatted = formatDateToDDMMYYYY(day)
+                                val startTimeFormatted = formatTimeToHHA(startTime)
+                                val endTimeFormatted = formatTimeToHHMMA(endTime)
+                                
+                                val shortName = if (termData.termName.isNotEmpty()) {
+                                    "[${termData.termName}]$dayFormatted $startTimeFormatted"
+                                } else {
+                                    "$dayFormatted $startTimeFormatted"
+                                }
+                                
+                                val termName = if (termData.termName.isNotEmpty()) {
+                                    "[${termData.termName}]$dayFullFormatted $endTimeFormatted"
+                                } else {
+                                    "$dayFullFormatted $endTimeFormatted"
+                                }
+                                
                                 val newTerm = termData.copy(
                                     groupId = groupId,
                                     is2D = "1",
-                                    termName = "${termData.termName}_${Random.nextInt(1000, 9999)}",
-                                    shortName = termData.termName,
+                                    termName = termName,
+                                    shortName = shortName,
                                     startDate = formattedStartDateTime,
                                     endDate = formattedEndDateTime,
                                     breakAmount = termData.breakAmount
@@ -1230,6 +1296,7 @@ fun ThreeDFormLayout(
             modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(fontSize = 14.sp)
         )
+        
         Spacer(modifier = Modifier.height(8.dp))
         
         OutlinedTextField(
