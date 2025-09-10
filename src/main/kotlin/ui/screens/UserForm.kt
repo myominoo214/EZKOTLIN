@@ -753,7 +753,10 @@ fun UserForm(
             
             Button(
                 onClick = ::handleSubmit,
-                enabled = !uiState.isLoading
+                enabled = !uiState.isLoading,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
             ) {
                 if (uiState.isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(16.dp))

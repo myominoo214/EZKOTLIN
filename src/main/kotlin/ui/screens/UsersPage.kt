@@ -23,6 +23,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material.Button as Material2Button
+import androidx.compose.material.ButtonDefaults as Material2ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.res.painterResource
 import androidx.compose.runtime.getValue
 import io.ktor.client.HttpClient
 import data.models.UserOption
@@ -146,22 +149,23 @@ fun UsersContent() {
                 )
             }
             
-            Button(
+            Material2Button(
                 onClick = {
                     selectedUser = null
                     showUserForm = true
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
             ) {
                 Icon(
-                    imageVector = Icons.Default.Add,
+                    painter = painterResource("add_user.png"),
                     contentDescription = "Add User",
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
+                    tint = Color.White
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Add User")
+                Text(
+                    text = "အသစ်လုပ်မည်",
+                    color = Color.White
+                )
             }
         }
         
