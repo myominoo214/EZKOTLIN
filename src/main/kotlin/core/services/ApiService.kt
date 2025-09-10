@@ -67,15 +67,40 @@ class ApiService {
         suspend fun addTerm(request: AddTermRequest): TermsApiResponse {
             val apiService = ApiService()
             val userSession = UserSession.getInstance()
-            val response = apiService.post<AddTermRequest, TermsApiResponse>(
-                url = "${BASE_URL}/v1/term/addTerm",
-                body = request,
-                headers = userSession.getAuthHeaders()
-            )
-            return if (response.success && response.data != null) {
-                response.data
-            } else {
-                TermsApiResponse(code = "500", status = "error", message = response.message ?: "Failed to add term", data = TermsApiResponseData(by = emptyList(), pagination = data.models.PaginationData(page = 1, limit = 30, total = 0)))
+            return try {
+                val response = apiService.postForString(
+                    url = "${BASE_URL}/v1/term/addTerms",
+                    body = request,
+                    headers = userSession.getAuthHeaders()
+                )
+                if (response.success) {
+                    println("[DEBUG] Term creation successful - Server response: ${response.data}")
+                    // Return success response regardless of server response format
+                    TermsApiResponse(
+                        code = "200", 
+                        status = "success", 
+                        message = "Term created successfully", 
+                        data = TermsApiResponseData(
+                            by = emptyList(), 
+                            pagination = data.models.PaginationData(page = 1, limit = 30, total = 0)
+                        )
+                    )
+                } else {
+                    println("[ERROR] Term creation failed - Server response: ${response.message}")
+                    TermsApiResponse(code = "500", status = "error", message = response.message ?: "Failed to add term", data = TermsApiResponseData(by = emptyList(), pagination = data.models.PaginationData(page = 1, limit = 30, total = 0)))
+                }
+            } catch (e: Exception) {
+                println("[ERROR] Exception during term creation: ${e.message}")
+                // Return error response for actual exceptions
+                TermsApiResponse(
+                    code = "500", 
+                    status = "error", 
+                    message = "Network error: ${e.message}", 
+                    data = TermsApiResponseData(
+                        by = emptyList(), 
+                        pagination = data.models.PaginationData(page = 1, limit = 30, total = 0)
+                    )
+                )
             }
         }
         

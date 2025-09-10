@@ -157,7 +157,7 @@ fun formatDateTimeToMyanmarTimezone(dateTimeString: String): String {
         val zonedDateTime = localDateTime.atZone(myanmarZone)
         println("[DEBUG] ZonedDateTime in Myanmar: $zonedDateTime")
         
-        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         val result = zonedDateTime.format(outputFormatter)
         println("[DEBUG] Final formatted result: '$result'")
         
@@ -177,7 +177,7 @@ fun formatDateTimeForApi(dateTimeString: String): String {
         val myanmarZone = ZoneId.of("Asia/Yangon")
         val zonedDateTime = localDateTime.atZone(myanmarZone)
         
-        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:ss")
         zonedDateTime.format(outputFormatter)
     } catch (e: Exception) {
         println("[ERROR] Failed to format datetime for API: ${e.message}")
@@ -393,6 +393,28 @@ fun convertISOToApiFormat(isoString: String): String {
         return zonedDateTime.format(outputFormatter)
     } catch (e: Exception) {
         println("[ERROR] Failed to convert ISO to API format '$isoString': ${e.message}")
+        return isoString
+    }
+}
+
+fun convertISOToApiFormatFor3D(isoString: String): String {
+    try {
+        if (isoString.isBlank()) {
+            return ""
+        }
+        
+        // Parse "yyyy-MM-dd HH:mm" format
+        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        val localDateTime = LocalDateTime.parse(isoString, inputFormatter)
+        
+        // Convert from system timezone to Yangon timezone and format for 3D API (YYYY-MM-DD HH:mm)
+        val systemZone = ZoneId.systemDefault()
+        val yangonZone = ZoneId.of("Asia/Yangon")
+        val zonedDateTime = localDateTime.atZone(systemZone).withZoneSameInstant(yangonZone)
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        return zonedDateTime.format(outputFormatter)
+    } catch (e: Exception) {
+        println("[ERROR] Failed to convert ISO to 3D API format '$isoString': ${e.message}")
         return isoString
     }
 }
@@ -782,7 +804,27 @@ fun TermsContent() {
             onSave = { termData ->
                 coroutineScope.launch {
                     try {
-                        val request = AddTermRequest(term = listOf(termData))
+                        // Generate groupId for 3D terms
+                        val groupId = (100000 + Random.nextInt(900000)).toString()
+                        
+                        // Convert AM/PM format to ISO format first, then format for 3D API (YYYY-MM-DD HH:mm format)
+                        val isoStartDate = convertDisplayToISOString(termData.startDate)
+                        val isoEndDate = convertDisplayToISOString(termData.endDate)
+                        val formattedStartDate = convertISOToApiFormatFor3D(isoStartDate)
+                        val formattedEndDate = convertISOToApiFormatFor3D(isoEndDate)
+                        
+                        // Create 3D term data with required payload structure
+                        val add3DData = termData.copy(
+                            groupId = groupId,
+                            is2D = "0",
+                            termName = termData.termName,
+                            shortName = termData.termName,
+                            startDate = formattedStartDate,
+                            endDate = formattedEndDate,
+                            breakAmount = termData.breakAmount
+                        )
+                        val request = AddTermRequest(term = listOf(add3DData))
+                        println("[DEBUG] 3D Term creation request: $request")
                         val response = ApiService.addTerm(request)
                         if (response.code == "200") {
                              showAddModal = false
@@ -796,6 +838,9 @@ fun TermsContent() {
             onSave2D = { termData, timeSlots ->
                 coroutineScope.launch {
                     try {
+                        // Generate groupId for 2D terms
+                         val groupId = (100000 + Random.nextInt(900000)).toString()
+                        
                         val days = getAllDaysBetweenDates(termData.startDate, termData.endDate)
                         val termsToCreate = mutableListOf<TermData>()
                         
@@ -808,13 +853,19 @@ fun TermsContent() {
                                 val formattedEndDateTime = formatDateTimeToMyanmarTimezone(endDateTime)
                                 
                                 val newTerm = termData.copy(
+                                    groupId = groupId,
+                                    is2D = "1",
                                     termName = "${termData.termName}_${Random.nextInt(1000, 9999)}",
+                                    shortName = termData.termName,
                                     startDate = formattedStartDateTime,
-                                    endDate = formattedEndDateTime
+                                    endDate = formattedEndDateTime,
+                                    breakAmount = termData.breakAmount
                                 )
                                 termsToCreate.add(newTerm)
                             }
                         }
+                        
+                        println("[DEBUG] 2D Terms creation payload: groupId=$groupId, is2D=1, termCount=${termsToCreate.size}, breakAmount=${termData.breakAmount}")
                         
                         val request = AddTermRequest(term = termsToCreate)
                         val response = ApiService.addTerm(request)
@@ -1025,6 +1076,9 @@ fun TwoDFormLayout(
         }
         
         timeSlots.forEachIndexed { index, (startTime, endTime) ->
+            var showStartTimePicker by remember { mutableStateOf(false) }
+            var showEndTimePicker by remember { mutableStateOf(false) }
+            
             Row {
                 OutlinedTextField(
                     value = startTime,
@@ -1034,11 +1088,11 @@ fun TwoDFormLayout(
                     label = { Text("Start Time ${index + 1}") },
                     readOnly = true,
                     modifier = Modifier.weight(1f).clickable {
-                        // Handle time picker for start time
+                        showStartTimePicker = true
                     },
                     trailingIcon = {
                         IconButton(onClick = {
-                            // Handle time picker for start time
+                            showStartTimePicker = true
                         }) {
                             Icon(Icons.Default.DateRange, contentDescription = null)
                         }
@@ -1056,16 +1110,37 @@ fun TwoDFormLayout(
                     label = { Text("End Time ${index + 1}") },
                     readOnly = true,
                     modifier = Modifier.weight(1f).clickable {
-                        // Handle time picker for end time
+                        showEndTimePicker = true
                     },
                     trailingIcon = {
                         IconButton(onClick = {
-                            // Handle time picker for end time
+                            showEndTimePicker = true
                         }) {
                             Icon(Icons.Default.DateRange, contentDescription = null)
                         }
                     },
                     textStyle = TextStyle(fontSize = 14.sp)
+                )
+            }
+            
+            // Time pickers for this slot
+            if (showStartTimePicker) {
+                TimePickerDialog(
+                    onTimeSelected = { time ->
+                        timeSlots[index] = time to endTime
+                        showStartTimePicker = false
+                    },
+                    onDismiss = { showStartTimePicker = false }
+                )
+            }
+            
+            if (showEndTimePicker) {
+                TimePickerDialog(
+                    onTimeSelected = { time ->
+                        timeSlots[index] = startTime to time
+                        showEndTimePicker = false
+                    },
+                    onDismiss = { showEndTimePicker = false }
                 )
             }
             
@@ -1089,6 +1164,8 @@ fun ThreeDFormLayout(
     onBreakAmountChange: (String) -> Unit,
     winNum: String,
     onWinNumChange: (String) -> Unit,
+    unitPrice: String,
+    onUnitPriceChange: (String) -> Unit,
     onShowStartDatePicker: () -> Unit,
     onShowEndDatePicker: () -> Unit
 ) {
@@ -1144,7 +1221,15 @@ fun ThreeDFormLayout(
             modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(fontSize = 14.sp)
         )
+        Spacer(modifier = Modifier.height(8.dp))
         
+        OutlinedTextField(
+            value = unitPrice,
+            onValueChange = onUnitPriceChange,
+            label = { Text("Unit Price") },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(fontSize = 14.sp)
+        )
         Spacer(modifier = Modifier.height(8.dp))
         
         OutlinedTextField(
@@ -1154,6 +1239,8 @@ fun ThreeDFormLayout(
             modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(fontSize = 14.sp)
         )
+        
+        
     }
 }
 
@@ -1227,6 +1314,8 @@ fun DatePickerDialog(
             TextButton(
                 onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
+                        // DatePicker returns milliseconds for the start of the selected day in local timezone
+                        // Convert to LocalDate using system default timezone to get the correct date
                         val instant = java.time.Instant.ofEpochMilli(millis)
                         val localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate()
                         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -1296,7 +1385,7 @@ fun TermFormModal(
     var startDate by remember { mutableStateOf(term?.startDate?.let { toLocalISOString(it) } ?: "") }
     var endDate by remember { mutableStateOf(term?.endDate?.let { toLocalISOString(it) } ?: "") }
     var winNum by remember { mutableStateOf(term?.winNum ?: "") }
-    var unitPrice by remember { mutableStateOf(term?.unitPrice?.toString() ?: "") }
+    var unitPrice by remember { mutableStateOf(term?.unitPrice?.toString() ?: "1") }
     var is2D by remember { mutableStateOf(term?.is2D == "1") }
     var prefix by remember { mutableStateOf("") }
     
@@ -1481,6 +1570,8 @@ fun TermFormModal(
                             onBreakAmountChange = { breakAmount = it },
                             winNum = winNum,
                             onWinNumChange = { winNum = it },
+                            unitPrice = unitPrice,
+                            onUnitPriceChange = { unitPrice = it },
                             onShowStartDatePicker = { show3DStartDatePicker = true },
                             onShowEndDatePicker = { show3DEndDatePicker = true }
                         )
@@ -1520,7 +1611,7 @@ fun TermFormModal(
                                     // 2D Form submission
                                     println("[DEBUG] 2D Form validation - breakAmount: '$breakAmount', winNum: '$winNum', prefix: '$prefix', startDate: '$selected2DStartDate', endDate: '$selected2DEndDate'")
                                     
-                                    if (breakAmount.isEmpty() || winNum.isEmpty() || prefix.isEmpty() || selected2DStartDate.isEmpty() || selected2DEndDate.isEmpty()) {
+                                    if (breakAmount.isEmpty()  || selected2DStartDate.isEmpty() || selected2DEndDate.isEmpty()) {
                                         println("[DEBUG] 2D validation failed: missing required fields")
                                         return@Button
                                     }
@@ -1575,10 +1666,10 @@ fun TermFormModal(
                                         println("[DEBUG] 3D validation failed: breakAmount is empty")
                                         return@Button
                                     }
-                                    if (winNum.isEmpty()) {
-                                        println("[DEBUG] 3D validation failed: winNum is empty")
-                                        return@Button
-                                    }
+                                    // if (winNum.isEmpty()) {
+                                    //     println("[DEBUG] 3D validation failed: winNum is empty")
+                                    //     return@Button
+                                    // }
                                     
                                     val termData = TermData(
                                         termId = 0,
@@ -1676,11 +1767,11 @@ fun TermFormModal(
         )
     }
     
-    // Date Pickers for 3D
+    // Date Time Pickers for 3D
     if (show3DStartDatePicker) {
-        DatePickerDialog(
-            onDateSelected = { date ->
-                selected3DStartDate = date
+        DateTimePickerDialog(
+            onDateTimeSelected = { dateTime ->
+                selected3DStartDate = dateTime
                 show3DStartDatePicker = false
             },
             onDismiss = { show3DStartDatePicker = false }
@@ -1688,9 +1779,9 @@ fun TermFormModal(
     }
     
     if (show3DEndDatePicker) {
-        DatePickerDialog(
-            onDateSelected = { date ->
-                selected3DEndDate = date
+        DateTimePickerDialog(
+            onDateTimeSelected = { dateTime ->
+                selected3DEndDate = dateTime
                 show3DEndDatePicker = false
             },
             onDismiss = { show3DEndDatePicker = false }
