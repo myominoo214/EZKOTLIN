@@ -6,6 +6,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -613,10 +614,16 @@ fun WinNumContent() {
                     
                     // Table Content
                     LazyColumn {
-                        items(winners) { winner ->
+                        itemsIndexed(winners) { index, winner ->
+                            val backgroundColor = if (index % 2 == 0) {
+                                MaterialTheme.colorScheme.surface
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            }
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .background(backgroundColor)
                                     .padding(12.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {

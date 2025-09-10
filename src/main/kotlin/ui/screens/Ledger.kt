@@ -828,13 +828,15 @@ fun Ledger(
                             }
                             
                             itemsIndexed(showData) { index, item ->
+                                val backgroundColor = if (index % 2 == 0) {
+                                    MaterialTheme.colorScheme.surface
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                }
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(
-                                            if (index % 2 == 0) MaterialTheme.colorScheme.surface
-                                            else MaterialTheme.colorScheme.surfaceVariant
-                                        )
+                                        .background(backgroundColor)
                                         .padding(12.dp)
                                 ) {
                                     Text(

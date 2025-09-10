@@ -6,6 +6,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -231,7 +232,19 @@ fun EditLogsContent() {
                         }
                         
                         // Table Rows
-                        items(logs) { log ->
+                        itemsIndexed(logs) { index, log ->
+                            val baseBackgroundColor = if (index % 2 == 0) {
+                                MaterialTheme.colorScheme.surface
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            }
+                            
+                            val backgroundColor = if (selectedLogId == log.logId) {
+                                Color(0xFFDCFCE7)
+                            } else {
+                                baseBackgroundColor
+                            }
+                            
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -245,10 +258,7 @@ fun EditLogsContent() {
                                             newData = emptyList()
                                         }
                                     }
-                                    .background(
-                                        if (selectedLogId == log.logId) Color(0xFFDCFCE7) 
-                                        else Color.Transparent
-                                    )
+                                    .background(backgroundColor)
                                     .padding(8.dp)
                             ) {
                                 TableCell(formatDate(log.saleDate), 0.2f)
@@ -366,10 +376,17 @@ fun DetailTable(data: List<LogDetailData>) {
         }
         
         // Data rows
-        items(data) { item ->
+        itemsIndexed(data) { index, item ->
+            val backgroundColor = if (index % 2 == 0) {
+                MaterialTheme.colorScheme.surface
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            }
+            
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(backgroundColor)
                     .padding(8.dp)
             ) {
                 TableCell(item.number, 0.25f)

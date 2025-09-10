@@ -16,6 +16,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 
@@ -372,12 +373,19 @@ fun UsersDataTable(
                 }
             } else {
                 LazyColumn {
-                    items(users) { user ->
+                    itemsIndexed(users) { index, user ->
+                        val backgroundColor = if (index % 2 == 0) {
+                            MaterialTheme.colorScheme.surface
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                        }
+                        
                         UserTableRow(
                             user = user,
                             onEdit = { onEditUser(user) },
                             onDelete = { onDeleteUser(user) },
-                            onCopyToClipboard = onCopyToClipboard
+                            onCopyToClipboard = onCopyToClipboard,
+                            backgroundColor = backgroundColor
                         )
                         if (user != users.last()) {
                             Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
@@ -394,11 +402,13 @@ fun UserTableRow(
     user: UserTableData,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onCopyToClipboard: (String) -> Unit
+    onCopyToClipboard: (String) -> Unit,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .background(backgroundColor)
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp),

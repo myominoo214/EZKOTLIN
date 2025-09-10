@@ -519,10 +519,16 @@ fun SimpleHotNumberComponent(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    items(state.hotNumbers) { hotNumber ->
+                    itemsIndexed(state.hotNumbers) { index, hotNumber ->
+                        val backgroundColor = if (index % 2 == 0) {
+                            MaterialTheme.colorScheme.surface
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                        }
                         SimpleHotNumberRow(
                             hotNumber = hotNumber,
-                            onDelete = { viewModel.deleteHotNumber(hotNumber.id) }
+                            onDelete = { viewModel.deleteHotNumber(hotNumber.id) },
+                            backgroundColor = backgroundColor
                         )
                     }
                 }
@@ -535,12 +541,13 @@ fun SimpleHotNumberComponent(
 fun SimpleHotNumberRow(
     hotNumber: SimpleHotNumber,
     onDelete: () -> Unit,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            containerColor = backgroundColor
         )
     ) {
         Row(

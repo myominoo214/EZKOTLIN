@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -13,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -175,11 +177,17 @@ fun TermSelectionDialog(
                             modifier = Modifier.weight(1f).heightIn(max = 400.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(groupedTerms) { group ->
+                            itemsIndexed(groupedTerms) { index, group ->
+                                val backgroundColor = if (index % 2 == 0) {
+                                    MaterialTheme.colorScheme.surface
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                }
                                 GroupedTermAccordion(
                                     group = group,
                                     selectedTerms = tempSelectedTerms,
                                     selectionMode = selectionMode,
+                                    backgroundColor = backgroundColor,
                                     onTermSelectionChanged = { term, isSelected ->
                                         tempSelectedTerms = when (selectionMode) {
                                             SelectionMode.SINGLE -> {
@@ -314,6 +322,7 @@ fun GroupedTermAccordion(
     group: GroupedTermOption,
     selectedTerms: List<TermOption>,
     selectionMode: SelectionMode,
+    backgroundColor: Color,
     onTermSelectionChanged: (TermOption, Boolean) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -329,7 +338,7 @@ fun GroupedTermAccordion(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = backgroundColor
         )
     ) {
         Column {

@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.TextButton
@@ -727,11 +728,17 @@ fun TermsContent() {
                                 }
                             }
                         } else {
-                            items(terms) { term ->
+                            itemsIndexed(terms) { index, term ->
+                            val backgroundColor = if (index % 2 == 0) {
+                                MaterialTheme.colorScheme.surface
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            }
+                            
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(Color.White)
+                                    .background(backgroundColor)
                                     .clickable {
                                         selectedTerm = term
                                         showEditModal = true

@@ -2,10 +2,12 @@ package ui.components
 
 import core.services.ApiService
 import core.services.UserSession
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -184,12 +186,18 @@ fun UserSelectionDialog(
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(users) { user ->
+                            itemsIndexed(users) { index, user ->
+                                val backgroundColor = if (index % 2 == 0) {
+                                    MaterialTheme.colorScheme.surface
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                }
                                 val isSelected = tempSelectedUser?.value == user.value
                                 
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .background(backgroundColor)
                                         .clickable {
                                             tempSelectedUser = user
                                         }

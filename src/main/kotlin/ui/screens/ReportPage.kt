@@ -9,6 +9,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -670,9 +671,10 @@ fun SimplifiedView(
         subTotal?.let { total ->
             Divider(modifier = Modifier.padding(vertical = 8.dp))
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
+                 modifier = Modifier
+                     .fillMaxWidth()
+                     .background(MaterialTheme.colorScheme.surfaceVariant)
+                     .padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -828,7 +830,12 @@ fun StatementTable(
             modifier = Modifier.weight(1f)
         ) {
         
-            items(rows) { row ->
+            itemsIndexed(rows) { index, row ->
+                val backgroundColor = if (index % 2 == 0) {
+                    MaterialTheme.colorScheme.surface
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
