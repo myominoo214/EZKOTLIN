@@ -186,7 +186,7 @@ fun Ledger(
                         isFinished = "",
                         termType = "",
                         winNum = "",
-                        is2D = false,
+                        //is2D = 0,
                         unitPrice = 0.0,
                         breakAmount = newAmount
                     )

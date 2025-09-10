@@ -30,7 +30,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerLayoutType
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
-import java.time.Instant
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -288,6 +288,115 @@ fun formatTime(time: String, format: String): String {
     }
 }
 
+fun toLocalISOString(dateTimeString: String): String {
+    return try {
+        if (dateTimeString.isBlank()) {
+            return ""
+        }
+        
+        val cleanInput = dateTimeString.trim()
+        
+        // Try to parse ISO format with milliseconds and Z (yyyy-MM-ddTHH:mm:ss.SSSZ)
+        if (cleanInput.matches(Regex("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z"))) {
+            // Parse as UTC instant and convert to system timezone
+            val instant = java.time.Instant.parse(cleanInput)
+            val zonedDateTime = instant.atZone(ZoneId.systemDefault())
+            
+            val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            return zonedDateTime.format(outputFormatter)
+        }
+        
+        // Try to parse ISO format (yyyy-MM-dd HH:mm:ss)
+        if (cleanInput.matches(Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}"))) {
+            val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            val localDateTime = LocalDateTime.parse(cleanInput, inputFormatter)
+            
+            val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            return localDateTime.format(outputFormatter)
+        }
+        
+        // Try to parse ISO format without seconds (yyyy-MM-dd HH:mm)
+        if (cleanInput.matches(Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}"))) {
+            val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            val localDateTime = LocalDateTime.parse(cleanInput, inputFormatter)
+            
+            val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            return localDateTime.format(outputFormatter)
+        }
+        
+        // If no pattern matches, return empty string
+        return ""
+        
+    } catch (e: Exception) {
+        println("[ERROR] Failed to convert to local ISO string '$dateTimeString': ${e.message}")
+        return ""
+    }
+}
+
+fun convertDisplayToISOString(dateTimeString: String): String {
+    return try {
+        println("[DEBUG] convertDisplayToISOString input: '$dateTimeString'")
+        
+        if (dateTimeString.isBlank()) {
+            println("[DEBUG] convertDisplayToISOString: Input is blank, returning empty string")
+            return ""
+        }
+        
+        val cleanInput = dateTimeString.trim()
+        println("[DEBUG] convertDisplayToISOString cleanInput: '$cleanInput'")
+        
+        // Try to parse display format (dd/MM/yyyy h:mm a or dd/MM/yyyy hh:mm a)
+        if (cleanInput.matches(Regex("\\d{2}/\\d{2}/\\d{4} \\d{1,2}:\\d{2} (AM|PM)", RegexOption.IGNORE_CASE))) {
+            println("[DEBUG] convertDisplayToISOString: Matched AM/PM format")
+            // Use flexible pattern that handles both single and double digit hours
+            val inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy h:mm a", Locale.ENGLISH)
+            val localDateTime = LocalDateTime.parse(cleanInput, inputFormatter)
+            
+            val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm")
+            val result = localDateTime.format(outputFormatter)
+            println("[DEBUG] convertDisplayToISOString AM/PM result: '$result'")
+            return result
+        }
+        
+        // Try to parse the new edit form format (yyyy-MM-dd HH:mm)
+        if (cleanInput.matches(Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}"))) {
+            println("[DEBUG] convertDisplayToISOString: Matched yyyy-MM-dd HH:mm format, returning as-is")
+            // Already in the correct format, just return it
+            return cleanInput
+        }
+        
+        println("[DEBUG] convertDisplayToISOString: No pattern matched, returning empty string")
+        // If no pattern matches, return empty string
+        return ""
+        
+    } catch (e: Exception) {
+        println("[ERROR] Failed to convert display to ISO string '$dateTimeString': ${e.message}")
+        return ""
+    }
+}
+
+fun convertISOToApiFormat(isoString: String): String {
+    try {
+        if (isoString.isBlank()) {
+            return ""
+        }
+        
+        // Parse "yyyy-MM-dd HH:mm" format
+        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        val localDateTime = LocalDateTime.parse(isoString, inputFormatter)
+        
+        // Convert from system timezone to Yangon timezone and format for API
+        val systemZone = ZoneId.systemDefault()
+        val yangonZone = ZoneId.of("Asia/Yangon")
+        val zonedDateTime = localDateTime.atZone(systemZone).withZoneSameInstant(yangonZone)
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        return zonedDateTime.format(outputFormatter)
+    } catch (e: Exception) {
+        println("[ERROR] Failed to convert ISO to API format '$isoString': ${e.message}")
+        return isoString
+    }
+}
+
 fun formatDateTime(dateTimeString: String): String {
     return try {
         println("[DEBUG] Formatting datetime: '$dateTimeString'")
@@ -304,31 +413,39 @@ fun formatDateTime(dateTimeString: String): String {
             return cleanInput
         }
         
+        val yangonZone = ZoneId.of("Asia/Yangon")
+        val systemZone = ZoneId.systemDefault()
+        
         // Try to parse ISO format with milliseconds and Z (yyyy-MM-ddTHH:mm:ss.SSSZ)
         if (cleanInput.matches(Regex("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z"))) {
-            val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-            val localDateTime = LocalDateTime.parse(cleanInput, inputFormatter)
+            // Parse as UTC instant and convert to system timezone
+            val instant = java.time.Instant.parse(cleanInput)
+            val zonedDateTime = instant.atZone(systemZone)
             
             val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a", Locale.ENGLISH)
-            return localDateTime.format(outputFormatter)
+            return zonedDateTime.format(outputFormatter)
         }
         
         // Try to parse ISO format (yyyy-MM-dd HH:mm:ss)
         if (cleanInput.matches(Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}"))) {
             val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val localDateTime = LocalDateTime.parse(cleanInput, inputFormatter)
+            // Treat the input as already in system timezone (no conversion needed)
+            val zonedDateTime = localDateTime.atZone(systemZone)
             
             val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a", Locale.ENGLISH)
-            return localDateTime.format(outputFormatter)
+            return zonedDateTime.format(outputFormatter)
         }
         
         // Try to parse ISO format without seconds (yyyy-MM-dd HH:mm)
         if (cleanInput.matches(Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}"))) {
             val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
             val localDateTime = LocalDateTime.parse(cleanInput, inputFormatter)
+            // Treat the input as already in system timezone (no conversion needed)
+            val zonedDateTime = localDateTime.atZone(systemZone)
             
             val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a", Locale.ENGLISH)
-            return localDateTime.format(outputFormatter)
+            return zonedDateTime.format(outputFormatter)
         }
         
         // If no pattern matches, return the original string
@@ -363,6 +480,13 @@ fun TermsContent() {
                     search = null
                 )
                 if (response.code == "200") {
+                    // Debug: Log the first term's date format
+                    if (response.data.by.isNotEmpty()) {
+                        val firstTerm = response.data.by.first()
+                        println("[DEBUG] API returned startDate: '${firstTerm.startDate}'")
+                        println("[DEBUG] API returned endDate: '${firstTerm.endDate}'")
+                    }
+                    
                     // Convert data.models.TermData to ui.screens.TermData
                     terms = response.data.by.map { apiTerm ->
                         TermData(
@@ -717,30 +841,49 @@ fun TermsContent() {
             onSave = { termData ->
                 coroutineScope.launch {
                     try {
-                        // Create UpdateTermRequest
+                        println("[DEBUG] Term update - Raw termData.startDate: '${termData.startDate}'")
+                        println("[DEBUG] Term update - Raw termData.endDate: '${termData.endDate}'")
+                        
+                        // Create UpdateTermRequest with properly formatted dates
+                        val formattedStartDate = convertISOToApiFormat(termData.startDate)
+                        val formattedEndDate = convertISOToApiFormat(termData.endDate)
+                        
+                        println("[DEBUG] Term update - Formatted startDate: '$formattedStartDate'")
+                        println("[DEBUG] Term update - Formatted endDate: '$formattedEndDate'")
+                        
                         val updateRequest = ApiService.UpdateTermRequest(
                             termId = termData.termId.toString(),
                             termName = termData.termName,
                             shortName = termData.shortName ?: "",
                             groupId = termData.groupId.toString(),
-                            startDate = termData.startDate,
-                            endDate = termData.endDate,
+                            startDate = formattedStartDate,
+                            endDate = formattedEndDate,
                             isFinished = termData.isFinished,
                             termType = termData.termType,
                             winNum = termData.winNum.toString(),
-                            is2D = termData.is2D == "1",
+                            //is2D = termData.is2D.toIntOrNull() ?: 0,
                             unitPrice = termData.unitPrice.toDouble(),
                             breakAmount = termData.breakAmount
                         )
+                        println("[DEBUG] Term update: '${updateRequest}'")
+                        println("[DEBUG] Term update - UpdateRequest startDate: '${updateRequest.startDate}'")
+                        println("[DEBUG] Term update - UpdateRequest endDate: '${updateRequest.endDate}'")
+                        
                         val apiService = ApiService()
                         val response = apiService.updateTerm(updateRequest)
+                        
+                        println("[DEBUG] Term update - API response: ${response}")
+                        
                         if (response.success) {
                             showEditModal = false
                             selectedTerm = null
                             loadTerms()
+                        } else {
+                            println("[DEBUG] Term update - API response failed: ${response.message}")
                         }
                     } catch (e: Exception) {
-                        println("Error updating term: ${e.message}")
+                        println("[ERROR] Error updating term: ${e.message}")
+                        e.printStackTrace()
                     }
                 }
             }
@@ -1040,16 +1183,12 @@ fun TimePickerDialog(
                 onClick = {
                     val hour = timePickerState.hour
                     val minute = timePickerState.minute
-                    val amPm = if (timePickerState.is24hour) {
-                        if (hour < 12) "AM" else "PM"
-                    } else {
-                        if (hour < 12) "AM" else "PM"
-                    }
-                    val displayHour = if (timePickerState.is24hour) {
-                        if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
-                    } else {
-                        hour
-                    }
+                    
+                    // Since is24Hour = false, the TimePicker already returns 12-hour format
+                    // We just need to determine AM/PM based on the hour value
+                    val amPm = if (hour < 12) "AM" else "PM"
+                    val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+                    
                     val timeString = String.format("%d:%02d %s", displayHour, minute, amPm)
                     onTimeSelected(timeString)
                 }
@@ -1088,7 +1227,7 @@ fun DatePickerDialog(
             TextButton(
                 onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
-                        val instant = Instant.ofEpochMilli(millis)
+                        val instant = java.time.Instant.ofEpochMilli(millis)
                         val localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate()
                         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
                         onDateSelected(localDate.format(formatter))
@@ -1154,8 +1293,8 @@ fun TermFormModal(
 ) {
     var termName by remember { mutableStateOf(term?.termName ?: "") }
     var breakAmount by remember { mutableStateOf(term?.breakAmount?.toString() ?: "") }
-    var startDate by remember { mutableStateOf(term?.startDate?.let { formatDateTime(it) } ?: "") }
-    var endDate by remember { mutableStateOf(term?.endDate?.let { formatDateTime(it) } ?: "") }
+    var startDate by remember { mutableStateOf(term?.startDate?.let { toLocalISOString(it) } ?: "") }
+    var endDate by remember { mutableStateOf(term?.endDate?.let { toLocalISOString(it) } ?: "") }
     var winNum by remember { mutableStateOf(term?.winNum ?: "") }
     var unitPrice by remember { mutableStateOf(term?.unitPrice?.toString() ?: "") }
     var is2D by remember { mutableStateOf(term?.is2D == "1") }
@@ -1359,14 +1498,21 @@ fun TermFormModal(
                         onClick = {
                             if (term != null) {
                                 // Edit mode submission
+                                println("[DEBUG] TermFormModal Edit - startDate variable: '$startDate'")
+                                println("[DEBUG] TermFormModal Edit - endDate variable: '$endDate'")
+                                
                                 val updatedTerm = term.copy(
                                     termName = termName,
                                     breakAmount = breakAmount.toIntOrNull() ?: 0,
-                                    startDate = formatDateTimeToMyanmarTimezone(startDate),
-                                    endDate = formatDateTimeToMyanmarTimezone(endDate),
+                                    startDate = startDate,
+                                    endDate = endDate,
                                     unitPrice = unitPrice.toIntOrNull() ?: 0,
                                     winNum = winNum
                                 )
+                                
+                                println("[DEBUG] TermFormModal Edit - updatedTerm.startDate: '${updatedTerm.startDate}'")
+                                println("[DEBUG] TermFormModal Edit - updatedTerm.endDate: '${updatedTerm.endDate}'")
+                                
                                 onSave(updatedTerm)
                             } else {
                                 // Add mode submission
@@ -1555,7 +1701,7 @@ fun TermFormModal(
     if (showEditStartDatePicker) {
         DateTimePickerDialog(
             onDateTimeSelected = { dateTime ->
-                startDate = dateTime
+                startDate = convertDisplayToISOString(dateTime)
                 showEditStartDatePicker = false
             },
             onDismiss = { showEditStartDatePicker = false }
@@ -1565,7 +1711,7 @@ fun TermFormModal(
     if (showEditEndDatePicker) {
         DateTimePickerDialog(
             onDateTimeSelected = { dateTime ->
-                endDate = dateTime
+                endDate = convertDisplayToISOString(dateTime)
                 showEditEndDatePicker = false
             },
             onDismiss = { showEditEndDatePicker = false }

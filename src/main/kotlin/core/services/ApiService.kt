@@ -79,20 +79,7 @@ class ApiService {
             }
         }
         
-        suspend fun updateTerm(termId: Int, termData: TermData): TermsApiResponse {
-            val apiService = ApiService()
-            val userSession = UserSession.getInstance()
-            val response = apiService.put<TermData, TermsApiResponse>(
-                url = "${BASE_URL}/v1/term/updateTerm/$termId",
-                body = termData,
-                headers = userSession.getAuthHeaders()
-            )
-            return if (response.success && response.data != null) {
-                response.data
-            } else {
-                TermsApiResponse(code = "500", status = "error", message = response.message ?: "Failed to update term", data = TermsApiResponseData(by = emptyList(), pagination = data.models.PaginationData(page = 1, limit = 30, total = 0)))
-            }
-        }
+        // Old updateTerm function removed to prevent conflicts with Boolean is2D
         
         suspend fun deleteTerm(termId: Int): TermsApiResponse {
             val apiService = ApiService()
@@ -780,7 +767,7 @@ class ApiService {
         val isFinished: String,
         val termType: String,
         val winNum: String,
-        val is2D: Boolean,
+        //val is2D: Int,
         val unitPrice: Double,
         @Serializable(with = BreakAmountSerializer::class)
         val breakAmount: Int

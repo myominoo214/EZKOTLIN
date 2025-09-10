@@ -385,10 +385,12 @@ fun DetailTable(data: List<LogDetailData>) {
 
 fun formatDate(dateString: String): String {
     return try {
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-        val outputFormat = SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault())
-        val date = inputFormat.parse(dateString)
-        outputFormat.format(date ?: Date())
+        // Parse UTC timestamp and convert to local timezone
+        val instant = java.time.Instant.parse(dateString)
+        val zonedDateTime = instant.atZone(java.time.ZoneId.systemDefault())
+        
+        val outputFormatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a", java.util.Locale.ENGLISH)
+        zonedDateTime.format(outputFormatter)
     } catch (e: Exception) {
         dateString
     }
