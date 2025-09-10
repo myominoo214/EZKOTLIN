@@ -39,8 +39,8 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.TextRange
+
+
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import kotlinx.coroutines.delay
+import core.config.CompactOutlinedTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,21 +77,19 @@ fun SearchableUserDropdown(
     
     // State variables
     var expanded by remember { mutableStateOf(false) }
-    var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
+    var searchText by remember { mutableStateOf("") }
     var selectedIndex by remember { mutableStateOf(-1) }
     var textFieldWidth by remember { mutableStateOf(0.dp) }
     var textFieldHeight by remember { mutableStateOf(0.dp) }
     
-    // Initialize textFieldValue based on selectedUser when component first loads
+    // Initialize searchText based on selectedUser when component first loads
     LaunchedEffect(selectedUser) {
         if (selectedUser != null && selectedUser.label.isNotEmpty()) {
-            textFieldValue = TextFieldValue(selectedUser.label)
+            searchText = selectedUser.label
         } else {
-            textFieldValue = TextFieldValue("")
+            searchText = ""
         }
     }
-    
-    val searchText = textFieldValue.text
     
     // Filter users based on search text
     val filteredUsers = remember(userOptions, searchText) {
@@ -161,7 +160,7 @@ fun SearchableUserDropdown(
                     } else if (selectedIndex >= 0 && selectedIndex < filteredUsers.size) {
                         onUserSelected(filteredUsers[selectedIndex])
                         expanded = false
-                        textFieldValue = TextFieldValue("")
+                        searchText = ""
                         selectedIndex = -1
                         focusManager.clearFocus()
                         return true
@@ -171,7 +170,7 @@ fun SearchableUserDropdown(
                 Key.Escape -> {
                     if (expanded) {
                         expanded = false
-                        textFieldValue = TextFieldValue("")
+                        searchText = ""
                         selectedIndex = -1
                         focusManager.clearFocus()
                         return true
@@ -191,7 +190,7 @@ fun SearchableUserDropdown(
             ) {
                 // Clear text field when Box is clicked if user is selected
                 if (selectedUser != null && selectedUser.label.isNotEmpty()) {
-                    textFieldValue = TextFieldValue("")
+                    searchText = ""
                     onUserSelected(UserOption("", ""))
                 }
                 if (!expanded) {
@@ -200,10 +199,10 @@ fun SearchableUserDropdown(
                 actualFocusRequester.requestFocus()
             }
         ) {
-            OutlinedTextField(
-                value = textFieldValue,
+            CompactOutlinedTextField(
+                value = searchText,
                 onValueChange = { value ->
-                    textFieldValue = value
+                    searchText = value
                     if (!expanded) {
                         expanded = true
                     }
@@ -225,12 +224,12 @@ fun SearchableUserDropdown(
                     onSearch = {
                         if (!expanded) {
                             expanded = true
-                            textFieldValue = TextFieldValue("")
+                            searchText = ""
                             selectedIndex = -1
                         } else if (selectedIndex >= 0 && selectedIndex < filteredUsers.size) {
                             onUserSelected(filteredUsers[selectedIndex])
                             expanded = false
-                            textFieldValue = TextFieldValue("")
+                            searchText = ""
                             selectedIndex = -1
                             focusManager.clearFocus()
                         }
@@ -243,7 +242,7 @@ fun SearchableUserDropdown(
                         if (focusState.isFocused) {
                             // Clear text field immediately when focused if user is selected
                             if (selectedUser != null && selectedUser.label.isNotEmpty()) {
-                                textFieldValue = TextFieldValue("")
+                                searchText = ""
                                 onUserSelected(UserOption("", ""))
                             }
                             if (!expanded) {
@@ -269,7 +268,7 @@ fun SearchableUserDropdown(
                     offset = IntOffset(0, with(density) { textFieldHeight.roundToPx() }),
                     onDismissRequest = {
                         expanded = false
-                        textFieldValue = TextFieldValue("")
+                        searchText = ""
                         selectedIndex = -1
                     },
                     properties = PopupProperties(
@@ -351,7 +350,7 @@ fun SearchableUserDropdown(
                                             ) {
                                                 onUserSelected(user)
                                                 expanded = false
-                                                textFieldValue = TextFieldValue("")
+                                                searchText = ""
                                                 selectedIndex = -1
                                                 focusManager.clearFocus()
                                             }

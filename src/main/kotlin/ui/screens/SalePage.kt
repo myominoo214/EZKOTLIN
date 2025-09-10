@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
+import core.config.CompactOutlinedTextField
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.Dialog
@@ -458,7 +459,7 @@ fun SimpleHotNumberComponent(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = state.inputHotNumber,
                     onValueChange = viewModel::updateInputHotNumber,
                     label = { Text("နံပါတ်") },

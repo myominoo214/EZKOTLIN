@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import kotlinx.coroutines.launch
+import core.config.CompactOutlinedTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -178,7 +179,7 @@ fun SearchableTermDropdown(
     
     Column(modifier = modifier) {
         Box {
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = if (expanded) searchText else (selectedTerm?.let { 
                     if (it.winNum != null) "${it.termName}(${it.winNum})" else it.termName 
                 } ?: ""),
@@ -196,7 +197,6 @@ fun SearchableTermDropdown(
                     }
                 }, 
                 readOnly = false,
-                singleLine = true,
                 trailingIcon = {
                     Row {
                         if (expanded && searchText.isNotEmpty()) {

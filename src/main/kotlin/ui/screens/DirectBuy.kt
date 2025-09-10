@@ -21,6 +21,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.net.URI
 import core.services.ApiResponse
+import core.config.CompactOutlinedTextField
 
 // Data Models
 @Serializable
@@ -516,12 +517,11 @@ fun InviteKeyModal(
                 }
                 
                 // Invite Key Input
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = inviteKey,
                     onValueChange = onInviteKeyChange,
                     label = { Text("Invite Key") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    modifier = Modifier.fillMaxWidth()
                 )
                 
                 // Confirm Button

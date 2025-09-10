@@ -10,6 +10,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.text.KeyboardOptions
+import core.config.CompactOutlinedTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,26 +56,24 @@ fun UpdateSlipSingle(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Number input field
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = number,
                 onValueChange = { number = it },
                 label = { Text("Number") },
                 placeholder = { Text("Number") },
                 modifier = Modifier.weight(1f),
-                singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text
                 )
             )
 
             // Amount input field
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = amount,
                 onValueChange = { amount = it },
                 label = { Text("Amount") },
                 placeholder = { Text("Amount") },
                 modifier = Modifier.weight(1f),
-                singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
                 )

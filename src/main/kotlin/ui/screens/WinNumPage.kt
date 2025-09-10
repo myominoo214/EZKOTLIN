@@ -349,6 +349,7 @@ fun WinNumContent() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
         // Header Card
@@ -356,7 +357,10 @@ fun WinNumContent() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -376,7 +380,10 @@ fun WinNumContent() {
                                 .fillMaxWidth()
                                 .height(56.dp)
                                 .clickable { showTermDialog = true },
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface
+                            )
                         ) {
                             Box(
                                 modifier = Modifier
@@ -573,14 +580,17 @@ fun WinNumContent() {
         if (winners.isNotEmpty()) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
             ) {
                 Column {
                     // Table Header
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .background(MaterialTheme.colorScheme.surfaceVariant) 
                             .padding(12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -588,25 +598,29 @@ fun WinNumContent() {
                             text = "စလစ်",
                             modifier = Modifier.weight(1f),
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "ထိုးသား",
                             modifier = Modifier.weight(3f),
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.End
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "ပမာဏ",
                             modifier = Modifier.weight(3f),
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.End
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "ဒဲ့(တွတ်)",
                             modifier = Modifier.weight(3f),
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.End
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     
@@ -630,7 +644,8 @@ fun WinNumContent() {
                                 Text(
                                     text = winner.slipId,
                                     modifier = Modifier.weight(1f),
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
                                     text = if (userSession.userProfileData?.userType != "owner") {
@@ -639,17 +654,20 @@ fun WinNumContent() {
                         winner.name.removePrefix(userSession.userProfileData?.businessName ?: "")
                     },
                                     modifier = Modifier.weight(3f),
-                                    textAlign = TextAlign.End
+                                    textAlign = TextAlign.End,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
                                     text = formatter.format(winner.amount),
                                     modifier = Modifier.weight(3f),
-                                    textAlign = TextAlign.End
+                                    textAlign = TextAlign.End,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
                                     text = "${formatter.format(winner.TotalAmountWithPrize)} (${formatter.format(winner.TotalTAmountWithPrize)})",
                                     modifier = Modifier.weight(3f),
-                                    textAlign = TextAlign.End
+                                    textAlign = TextAlign.End,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                             Divider()
@@ -667,25 +685,29 @@ fun WinNumContent() {
                                 ) {
                                     Text(
                                         text = "",
-                                        modifier = Modifier.weight(1f)
+                                        modifier = Modifier.weight(1f),
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Text(
                                         text = "Total",
                                         modifier = Modifier.weight(3f),
                                         fontWeight = FontWeight.Bold,
-                                        textAlign = TextAlign.End
+                                        textAlign = TextAlign.End,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Text(
                                         text = formatter.format(totals.amount),
                                         modifier = Modifier.weight(3f),
                                         fontWeight = FontWeight.Bold,
-                                        textAlign = TextAlign.End
+                                        textAlign = TextAlign.End,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Text(
                                         text = "${formatter.format(totals.TotalAmountWithPrize)} (${formatter.format(totals.TotalTAmountWithPrize)})",
                                         modifier = Modifier.weight(3f),
                                         fontWeight = FontWeight.Bold,
-                                        textAlign = TextAlign.End
+                                        textAlign = TextAlign.End,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                             }

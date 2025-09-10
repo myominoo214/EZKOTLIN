@@ -20,12 +20,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.TextRange
+
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.LocalTextStyle
 // Preview not available in desktop Compose
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ui.components.CustomTextField
+import core.config.CompactOutlinedTextField
 // Removed Android lifecycle imports for desktop compatibility
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -359,11 +361,10 @@ class ThreeDViewModel {
     }
     
     fun selectAllUnitText() {
-        val currentValue = _state.value.unitPrice3D
-        _state.value = _state.value.copy(
-            unitPrice3D = currentValue.copy(
-                selection = TextRange(0, currentValue.text.length)
-            )
+        val currentState = _state.value
+        val newSelection = TextRange(0, currentState.unitPrice3D.text.length)
+        _state.value = currentState.copy(
+            unitPrice3D = currentState.unitPrice3D.copy(selection = newSelection)
         )
     }
     
@@ -810,9 +811,10 @@ fun ThreeDView(
                     onCheckedChange = viewModel::toggleAutoIncrement
                 )
                 
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = state.number3D,
                     onValueChange = viewModel::updateNumber3D,
+                    singleLine = true,
                     modifier = Modifier
                         .weight(1f)
                         .focusRequester(viewModel.numberFocusRequester)
@@ -840,7 +842,6 @@ fun ThreeDView(
                             }
                         },
                     enabled = !state.autoIncrement3D,
-                    singleLine = true,
                     isError = state.number3DError != null,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -857,8 +858,9 @@ fun ThreeDView(
             }
             
             // Unit Input
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = state.unitPrice3D,
+                singleLine = true,
                 onValueChange = viewModel::updateUnitPrice3D,
                 modifier = Modifier
                     .weight(1f)
@@ -875,7 +877,6 @@ fun ThreeDView(
                         } else false
                     },
                 isError = state.unitPriceError != null,
-                singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done

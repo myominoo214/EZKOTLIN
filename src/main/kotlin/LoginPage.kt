@@ -1,7 +1,7 @@
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Star
@@ -28,6 +28,7 @@ import core.services.SettingsApiResponse
 import core.services.UserSession
 import core.services.UserProfileApiResponse
 import java.io.File
+import core.config.CompactOutlinedTextField
 
 @Serializable
 data class LoginRequest(
@@ -93,7 +94,7 @@ fun LoginPage(
     val passwordFocusRequester = remember { FocusRequester() }
     val coroutineScope = rememberCoroutineScope()
     val apiService = remember { ApiService() }
-    val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = remember { SnackbarHostState() }
     val userSession = remember { UserSession.getInstance() }
     
     fun performLogin() {
@@ -188,7 +189,7 @@ fun LoginPage(
     // Show snackbar when there's an error
     LaunchedEffect(showSnackbar) {
         if (showSnackbar) {
-            scaffoldState.snackbarHostState.showSnackbar(
+            snackbarHostState.showSnackbar(
                 message = errorMessage,
                 duration = SnackbarDuration.Short
             )
@@ -197,9 +198,9 @@ fun LoginPage(
     }
 
     Scaffold(
-        scaffoldState = scaffoldState,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = Modifier.fillMaxSize()
-    ) {
+    ) { paddingValues ->
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -208,7 +209,7 @@ fun LoginPage(
             modifier = Modifier
                 .width(400.dp)
                 .padding(16.dp),
-            elevation = 8.dp
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
                 modifier = Modifier.padding(32.dp),
@@ -218,7 +219,7 @@ fun LoginPage(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = username,
                     onValueChange = { 
                         username = it
@@ -235,7 +236,7 @@ fun LoginPage(
                     )
                 )
 
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = password,
                     onValueChange = { 
                         password = it

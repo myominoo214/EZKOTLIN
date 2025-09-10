@@ -1,6 +1,7 @@
 package ui.screens
 
 // Data models and stores
+import core.config.CompactOutlinedTextField
 import core.stores.LedgerStore
 import core.stores.TempListStore
 import core.stores.rememberTempListStore
@@ -145,10 +146,11 @@ class TwoDViewModel {
     }
     
     fun selectAllUnitText() {
-        val currentValue = _state.value.unit2D
-        _state.value = _state.value.copy(
-            unit2D = currentValue.copy(
-                selection = TextRange(0, currentValue.text.length)
+        val currentState = _state.value
+        val text = currentState.unit2D.text
+        _state.value = currentState.copy(
+            unit2D = currentState.unit2D.copy(
+                selection = TextRange(0, text.length)
             )
         )
     }
@@ -839,7 +841,7 @@ fun TwoDView(
                     onCheckedChange = viewModel::handleAutoIncrementChange
                 )
                 
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = state.number2D,
                     onValueChange = viewModel::updateNumber2D,
                     modifier = Modifier
@@ -901,7 +903,7 @@ fun TwoDView(
             }
             
             // Unit Input
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = state.unit2D,
                 onValueChange = viewModel::updateUnitPrice2D,
                 modifier = Modifier
