@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import core.services.UserApiService
+import core.services.ApiService
 
-class UserFormViewModel(private val userApiService: UserApiService, private val scope: CoroutineScope) {
+class UserFormViewModel(private val userApiService: ApiService, private val scope: CoroutineScope) {
     
     private val _uiState = MutableStateFlow(UserFormUiState())
     val uiState: StateFlow<UserFormUiState> = _uiState.asStateFlow()

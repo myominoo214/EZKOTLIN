@@ -75,11 +75,11 @@ class UpdateService(private val httpClient: HttpClient) {
         if (response.status == HttpStatusCode.OK) {
             val channel = response.bodyAsChannel()
             destinationFile.outputStream().use { output ->
+                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
                 while (!channel.isClosedForRead) {
-                    val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
-                    while (!packet.isEmpty) {
-                        val bytes = packet.readBytes()
-                        output.write(bytes)
+                    val bytesRead = channel.readAvailable(buffer)
+                    if (bytesRead > 0) {
+                        output.write(buffer, 0, bytesRead)
                     }
                 }
             }

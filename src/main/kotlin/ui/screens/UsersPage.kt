@@ -7,7 +7,7 @@ import data.models.UsersListResponse
 import data.models.displayHotBreakPercentage
 import data.models.displayAgentName
 import data.models.displayUserType
-import core.services.UserApiService
+import core.services.ApiService
 import presentation.viewmodels.UserFormViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,7 +39,6 @@ import io.ktor.client.HttpClient
 import data.models.UserOption
 import ui.components.fetchUsers
 import data.models.UsersPageState
-import core.services.ApiService
 import core.services.UserSession
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -54,8 +53,7 @@ fun UsersContent() {
     val scope = rememberCoroutineScope()
     val apiService = remember { ApiService() }
     val httpClient = remember { HttpClient() }
-    val userApiService = remember { UserApiService(httpClient) }
-    val viewModel = remember { UserFormViewModel(userApiService, scope) }
+    val viewModel = remember { UserFormViewModel(apiService, scope) }
     val clipboardManager = LocalClipboardManager.current
     
     // Fetch users data
@@ -244,7 +242,7 @@ fun UsersContent() {
                         showUserForm = false
                         fetchUsersData() // Refresh the list
                     },
-                    userApiService = userApiService,
+                    userApiService = apiService,
                     viewModel = viewModel
                 )
             }

@@ -27,7 +27,7 @@ import ui.dialogs.UpdateProgressDialog
 fun App() {
     var currentScreen by remember { mutableStateOf("login") }
     val userSession = remember { UserSession.getInstance() }
-    val updateService = remember { UpdateService(ApiService.httpClient) }
+    val updateService = remember { UpdateService(ApiService().client) }
     val coroutineScope = rememberCoroutineScope()
     
     // Update-related state

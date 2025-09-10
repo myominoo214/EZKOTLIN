@@ -170,19 +170,7 @@ data class SalePageState(
     val showOptionsModal: Boolean = false
 )
 
-// API Service Interface
-interface SaleApiService {
-    suspend fun getActiveTerms(current: Int = 1, limit: Int = 100000): ApiResponse<List<SaleTerm>>
-    suspend fun getUserProfile(): ApiResponse<UserProfile>
-    suspend fun getUserLists(current: Int = 1, limit: Int = 100000): ApiResponse<List<User>>
-    suspend fun getApiUserData(current: Int = 1, limit: Int = 100000): ApiResponse<List<ApiUserData>>
-    suspend fun getBettedTotalUnits(termId: String, userId: String): ApiResponse<BettedUnitsResponse>
-    suspend fun buySlip(payload: SlipPayload): ApiResponse<SlipResponse>
-    suspend fun saveSlip(payload: SlipPayload): ApiResponse<SlipResponse>
-    suspend fun addSlips(payload: SlipPayload): ApiResponse<SlipResponse>
-    suspend fun addSlipsWithHotBreak(payload: SlipPayload): ApiResponse<SlipResponse>
-    suspend fun saveSlips(payload: SlipPayload): ApiResponse<SlipResponse>
-}
+// Note: SaleApiService interface removed - using ApiService directly
 
 @Serializable
 data class SlipPayload(
@@ -195,123 +183,7 @@ data class SlipPayload(
     val userType: String
 )
 
-// API Service Implementations
-class MockApiService : SaleApiService {
-    override suspend fun getActiveTerms(current: Int, limit: Int): ApiResponse<List<SaleTerm>> {
-        return ApiResponse(
-            code = "200",
-            message = "Success",
-            data = listOf(
-                SaleTerm(
-                    termId = "1",
-                    termName = "Morning Term",
-                    unitPrice = 100.0,
-                    breakAmount = 1000.0,
-                    is2D = "1",
-                    termType = "regular"
-                ),
-                SaleTerm(
-                    termId = "2",
-                    termName = "Evening Term",
-                    unitPrice = 100.0,
-                    breakAmount = 1500.0,
-                    is2D = "0",
-                    termType = "regular"
-                )
-            )
-        )
-    }
-
-    override suspend fun getUserProfile(): ApiResponse<UserProfile> {
-        return ApiResponse(
-            code = "200",
-            message = "Success",
-            data = UserProfile(
-                businessName = "Sample Business",
-                name = "John Doe",
-                userType = "owner"
-            )
-        )
-    }
-
-    override suspend fun getUserLists(current: Int, limit: Int): ApiResponse<List<User>> {
-        return ApiResponse(
-            code = "200",
-            message = "Success",
-            data = listOf(
-                User(userId = "1", name = "Admin User", userType = "admin"),
-                User(userId = "2", name = "Regular User", userType = "user")
-            )
-        )
-    }
-
-    override suspend fun getApiUserData(current: Int, limit: Int): ApiResponse<List<ApiUserData>> {
-        return ApiResponse(
-            code = "200",
-            message = "Success",
-            data = listOf(
-                ApiUserData(userId = "1", discount2D = 0.1, discount3D = 0.15)
-            )
-        )
-    }
-
-    override suspend fun getBettedTotalUnits(termId: String, userId: String): ApiResponse<BettedUnitsResponse> {
-        return ApiResponse(
-            code = "200",
-            message = "Success",
-            data = BettedUnitsResponse(totalUnits = Random.nextInt(0, 100))
-        )
-    }
-
-    override suspend fun addSlips(payload: SlipPayload): ApiResponse<SlipResponse> {
-        return ApiResponse(
-            code = "200",
-            message = "Success",
-            data = SlipResponse(
-                slipId = "SLIP${Random.nextInt(1000, 9999)}",
-                ledger = payload.ledger
-            )
-        )
-    }
-
-    override suspend fun addSlipsWithHotBreak(payload: SlipPayload): ApiResponse<SlipResponse> {
-        return ApiResponse(
-            code = "200",
-            message = "Success with hot break",
-            data = SlipResponse(
-                slipId = "SLIP${Random.nextInt(1000, 9999)}",
-                ledger = payload.ledger
-            )
-        )
-    }
-
-    override suspend fun saveSlips(payload: SlipPayload): ApiResponse<SlipResponse> {
-        return ApiResponse(
-            code = "200",
-            message = "Saved successfully",
-            data = SlipResponse(
-                slipId = "SAVE${Random.nextInt(1000, 9999)}",
-                ledger = payload.ledger
-            )
-        )
-    }
-
-    override suspend fun buySlip(payload: SlipPayload): ApiResponse<SlipResponse> {
-        return ApiResponse(
-            code = "200",
-            message = "Success",
-            data = SlipResponse(slipId = "slip_${Random.nextInt(1000, 9999)}", ledger = payload.ledger)
-        )
-    }
-
-    override suspend fun saveSlip(payload: SlipPayload): ApiResponse<SlipResponse> {
-        return ApiResponse(
-            code = "200",
-            message = "Success",
-            data = SlipResponse(slipId = "save_${Random.nextInt(1000, 9999)}", ledger = payload.ledger)
-        )
-    }
-}
+// Note: MockApiService removed - using ApiService directly with fallback data
 
 // Simplified HotNumber data models
 data class SimpleHotNumber(
@@ -698,325 +570,11 @@ fun SimpleHotNumberRow(
     }
 }
 
-class RealApiService(private val baseUrl: String = ApiService.BASE_URL) : SaleApiService {
-    private val client = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(kotlinx.serialization.json.Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-                encodeDefaults = false
-            })
-        }
-        install(Logging) {
-            level = LogLevel.INFO
-        }
-    }
-
-    private fun getAuthHeaders(): Map<String, String> {
-        return UserSession.getInstance().getAuthHeaders()
-    }
-
-    override suspend fun getActiveTerms(current: Int, limit: Int): ApiResponse<List<SaleTerm>> {
-        return try {
-            val response = client.get("$baseUrl/v1/term/getActiveTerms") {
-                parameter("current", current)
-                parameter("limit", limit)
-                getAuthHeaders().forEach { (key, value) ->
-                    header(key, value)
-                }
-            }
-            // Try direct array format first, fallback to nested response
-            try {
-                response.body<ApiResponse<List<SaleTerm>>>()
-            } catch (directError: Exception) {
-                // Fallback to nested response format
-                val nestedResponse = response.body<NestedApiResponse<List<SaleTerm>>>()
-                ApiResponse(
-                    code = nestedResponse.code,
-                    message = nestedResponse.message,
-                    data = nestedResponse.data.by
-                )
-            }
-        } catch (e: Exception) {
-            println("Error fetching active terms: ${e.message}")
-            // Fallback to mock data if API fails
-            ApiResponse(
-                code = "200",
-                message = "Success (Fallback)",
-                data = listOf(
-                    SaleTerm(
-                        termId = "1",
-                        termName = "Morning Term",
-                        unitPrice = 100.0,
-                        breakAmount = 1000.0,
-                        is2D = "1",
-                        termType = "regular"
-                    ),
-                    SaleTerm(
-                        termId = "2",
-                        termName = "Evening Term",
-                        unitPrice = 100.0,
-                        breakAmount = 1500.0,
-                        is2D = "0",
-                        termType = "regular"
-                    )
-                )
-            )
-        }
-    }
-
-    override suspend fun getUserProfile(): ApiResponse<UserProfile> {
-        return try {
-            val response = client.get("$baseUrl/v1/account/getUserProfile") {
-                getAuthHeaders().forEach { (key, value) ->
-                    header(key, value)
-                }
-            }
-            response.body<ApiResponse<UserProfile>>()
-        } catch (e: Exception) {
-            println("Error fetching user profile: ${e.message}")
-            ApiResponse(
-                code = "200",
-                message = "Success (Fallback)",
-                data = UserProfile(
-                    businessName = "Test Business",
-                    name = "Test User",
-                    userType = "owner"
-                )
-            )
-        }
-    }
-
-    override suspend fun getUserLists(current: Int, limit: Int): ApiResponse<List<User>> {
-        return try {
-            val response = client.get("$baseUrl/v1/account/getUserLists") {
-                parameter("current", current)
-                parameter("limit", limit)
-                getAuthHeaders().forEach { (key, value) ->
-                    header(key, value)
-                }
-            }
-            val nestedResponse = response.body<NestedApiResponse<List<User>>>()
-            ApiResponse(
-                code = nestedResponse.code,
-                message = nestedResponse.message,
-                data = nestedResponse.data.by
-            )
-        } catch (e: Exception) {
-            println("Error fetching user lists: ${e.message}")
-            ApiResponse(
-                code = "200",
-                message = "Success (Fallback)",
-                data = listOf(
-                    User(userId = "1", name = "Admin User", userType = "admin"),
-                    User(userId = "2", name = "Regular User", userType = "user")
-                )
-            )
-        }
-    }
-
-    override suspend fun getApiUserData(current: Int, limit: Int): ApiResponse<List<ApiUserData>> {
-        return try {
-            val response = client.get("$baseUrl/v1/account/getUserLists") {
-                parameter("current", current)
-                parameter("limit", limit)
-                getAuthHeaders().forEach { (key, value) ->
-                    header(key, value)
-                }
-            }
-            val nestedResponse = response.body<NestedApiResponse<List<User>>>()
-            // Convert User data to ApiUserData format
-            val apiUserData = nestedResponse.data.by.map { user ->
-                ApiUserData(
-                    userId = user.userId,
-                    discount2D = 0.0, // Default values since this data isn't in user lists
-                    discount3D = 0.0
-                )
-            }
-            ApiResponse(
-                code = nestedResponse.code,
-                message = nestedResponse.message,
-                data = apiUserData
-            )
-        } catch (e: Exception) {
-            println("Error fetching API user data: ${e.message}")
-            ApiResponse(
-                code = "200",
-                message = "Success (Fallback)",
-                data = listOf(
-                    ApiUserData(userId = "1", discount2D = 0.1, discount3D = 0.15)
-                )
-            )
-        }
-    }
-
-    override suspend fun getBettedTotalUnits(termId: String, userId: String): ApiResponse<BettedUnitsResponse> {
-        return try {
-            val response = client.get("$baseUrl/v1/betting/totalUnits") {
-                parameter("termId", termId)
-                parameter("userId", userId)
-                getAuthHeaders().forEach { (key, value) ->
-                    header(key, value)
-                }
-            }
-            response.body<ApiResponse<BettedUnitsResponse>>()
-        } catch (e: Exception) {
-            println("Error fetching betted total units: ${e.message}")
-            ApiResponse(
-                code = "200",
-                message = "Success (Fallback)",
-                data = BettedUnitsResponse(totalUnits = Random.nextInt(0, 1000))
-            )
-        }
-    }
-
-    override suspend fun buySlip(payload: SlipPayload): ApiResponse<SlipResponse> {
-        return try {
-            val response = client.post("$baseUrl/v1/slip/buy") {
-                setBody(payload)
-                getAuthHeaders().forEach { (key, value) ->
-                    header(key, value)
-                }
-            }
-            response.body<ApiResponse<SlipResponse>>()
-        } catch (e: Exception) {
-            println("Error buying slip: ${e.message}")
-            ApiResponse(
-                code = "200",
-                message = "Success (Fallback)",
-                data = SlipResponse(slipId = "mock-slip-${System.currentTimeMillis()}", ledger = payload.ledger)
-            )
-        }
-    }
-
-    override suspend fun saveSlip(payload: SlipPayload): ApiResponse<SlipResponse> {
-        return try {
-            val response = client.post("$baseUrl/v1/slip/save") {
-                setBody(payload)
-                getAuthHeaders().forEach { (key, value) ->
-                    header(key, value)
-                }
-            }
-            response.body<ApiResponse<SlipResponse>>()
-        } catch (e: Exception) {
-            println("Error saving slip: ${e.message}")
-            ApiResponse(
-                code = "200",
-                message = "Success (Fallback)",
-                data = SlipResponse(slipId = "mock-save-${System.currentTimeMillis()}", ledger = payload.ledger)
-            )
-        }
-    }
-    
-    override suspend fun addSlips(payload: SlipPayload): ApiResponse<SlipResponse> {
-        return try {
-            val response = client.post("$baseUrl/v1/slip/addSlips") {
-                contentType(ContentType.Application.Json)
-                setBody(payload)
-                getAuthHeaders().forEach { (key, value) ->
-                    header(key, value)
-                }
-            }
-            
-            // Check if response is successful
-            if (response.status.isSuccess()) {
-                response.body<ApiResponse<SlipResponse>>()
-            } else {
-                println("HTTP Error ${response.status.value}: ${response.status.description}")
-                val errorBody = response.body<String>()
-                println("Error response body: $errorBody")
-                
-                ApiResponse(
-                    code = "${response.status.value}",
-                    message = "HTTP Error: ${response.status.description}",
-                    data = SlipResponse(
-                        slipId = "ERROR_${System.currentTimeMillis()}",
-                        ledger = payload.ledger
-                    )
-                )
-            }
-        } catch (e: Exception) {
-            println("Error adding slips: ${e.message}")
-            e.printStackTrace()
-            ApiResponse(
-                code = "500",
-                message = "Exception: ${e.message}",
-                data = SlipResponse(
-                    slipId = "EXCEPTION_${System.currentTimeMillis()}",
-                    ledger = payload.ledger
-                )
-            )
-        }
-    }
-    
-    override suspend fun addSlipsWithHotBreak(payload: SlipPayload): ApiResponse<SlipResponse> {
-        return try {
-            val response = client.post("$baseUrl/v1/slip/addSlipsWithHotBreak") {
-                contentType(ContentType.Application.Json)
-                setBody(payload)
-                getAuthHeaders().forEach { (key, value) ->
-                    header(key, value)
-                }
-            }
-            
-            // Check if response is successful
-            if (response.status.isSuccess()) {
-                response.body<ApiResponse<SlipResponse>>()
-            } else {
-                println("HTTP Error ${response.status.value}: ${response.status.description}")
-                val errorBody = response.body<String>()
-                println("Error response body: $errorBody")
-                
-                ApiResponse(
-                    code = "${response.status.value}",
-                    message = "HTTP Error: ${response.status.description}",
-                    data = SlipResponse(
-                        slipId = "ERROR_${System.currentTimeMillis()}",
-                        ledger = payload.ledger
-                    )
-                )
-            }
-        } catch (e: Exception) {
-            println("Error adding slips with hot break: ${e.message}")
-            e.printStackTrace()
-            ApiResponse(
-                code = "500",
-                message = "Exception: ${e.message}",
-                data = SlipResponse(
-                    slipId = "EXCEPTION_${System.currentTimeMillis()}",
-                    ledger = payload.ledger
-                )
-            )
-        }
-    }
-    
-    override suspend fun saveSlips(payload: SlipPayload): ApiResponse<SlipResponse> {
-        return try {
-            val response = client.post("$baseUrl/v1/slip/saveSlips") {
-                contentType(ContentType.Application.Json)
-                setBody(payload)
-                getAuthHeaders().forEach { (key, value) ->
-                    header(key, value)
-                }
-            }
-            response.body<ApiResponse<SlipResponse>>()
-        } catch (e: Exception) {
-            println("Error saving slips: ${e.message}")
-            ApiResponse(
-                code = "200",
-                message = "Saved successfully (Fallback)",
-                data = SlipResponse(
-                    slipId = "SAVE${Random.nextInt(1000, 9999)}",
-                    ledger = payload.ledger
-                )
-            )
-        }
-    }
-}
+// RealApiService class removed - using ApiService directly
 
 // ViewModel
 class SalePageViewModel(
-    private val apiService: SaleApiService = RealApiService()
+    private val apiService: ApiService = ApiService()
 ) {
     private val _state = MutableStateFlow(SalePageState())
     val state: StateFlow<SalePageState> = _state.asStateFlow()
@@ -1063,13 +621,13 @@ class SalePageViewModel(
                 )
                 
                 // Load terms
-                val termsResponse = apiService.getActiveTerms()
+                val termsResponse = apiService.getActiveTerms(1, 100)
                 if (termsResponse.code == "200") {
                     initializeTermData(termsResponse.data)
                 }
                 
                 // Load users
-                val usersResponse = apiService.getUserLists()
+                val usersResponse = apiService.getUserLists(1, 100)
                 if (usersResponse.code == "200") {
                     val userOptions = usersResponse.data.map { user ->
                         UserOption(
@@ -1652,7 +1210,7 @@ class SalePageViewModel(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SalePage(
-    apiService: SaleApiService = RealApiService()
+    apiService: ApiService = ApiService()
 ) {
     LaunchedEffect(Unit) {
         println("[DEBUG] SalePage composable is being rendered!")

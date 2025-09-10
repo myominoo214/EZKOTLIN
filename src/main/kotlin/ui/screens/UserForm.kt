@@ -6,7 +6,7 @@ import data.models.UserType
 import data.models.BetType
 import data.models.AgentOption
 import data.models.FormValidationState
-import core.services.UserApiService
+import core.services.ApiService
 import presentation.viewmodels.UserFormViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -33,7 +33,7 @@ fun UserForm(
     merchantDetail: UserData? = null,
     formType: String = "Agent",
     onClose: () -> Unit = {},
-    userApiService: UserApiService = UserApiService(HttpClient()),
+    userApiService: ApiService = ApiService(),
     viewModel: UserFormViewModel
 ) {
     // Form state
