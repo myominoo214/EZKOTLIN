@@ -40,15 +40,15 @@ import androidx.compose.ui.unit.sp
 
 // Custom Material 3 color schemes
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF0D47A1),        // Deep Blue
+    primary = Color(0xFF002147),        // Oxford Blue
     onPrimary = Color.White,
-    primaryContainer = Color(0xFF1976D2),
+    primaryContainer = Color(0xFF003366),
     onPrimaryContainer = Color.White,
-    secondary = Color(0xFF1976D2),      // Lighter blue accent
+    secondary = Color(0xFF003366),      // Darker Oxford Blue accent
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFF42A5F5),
+    secondaryContainer = Color(0xFF004080),
     onSecondaryContainer = Color.White,
-    background = Color(0xFFF8FAFF),     // Light bluish white
+    background = Color(0xFFF0F7FF),     // Light bluish white
     onBackground = Color(0xFF0A1A2F),   // Navy-gray text
     surface = Color(0xFFF8FAFF),
     onSurface = Color(0xFF0A1A2F),

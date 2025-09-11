@@ -62,7 +62,6 @@ fun SalesPage(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
                 .padding(2.dp)
         ) {
             when (selectedItem) {

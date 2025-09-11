@@ -1241,11 +1241,10 @@ fun SalePage(
         println("[DEBUG] Main Column is rendering!")
     }
     
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
                 .padding(2.dp)
                 .onKeyEvent { keyEvent ->
                     println("Global Column key event: ${keyEvent.key}, type: ${keyEvent.type}, termOpen: ${state.termOpen}")

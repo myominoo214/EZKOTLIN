@@ -209,7 +209,10 @@ fun LoginPage(
             modifier = Modifier
                 .width(400.dp)
                 .padding(16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFFFFFFF) // Blue theme color
+            )
         ) {
             Column(
                 modifier = Modifier.padding(32.dp),

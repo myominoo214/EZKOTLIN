@@ -52,13 +52,10 @@ fun SalePageLeftContent(
     val tempListStore = rememberTempListStore()
 
     // Left Section - Main Controls (40%)
-    Card(
-        modifier = modifier.fillMaxHeight()
+    Column(
+        modifier = modifier.fillMaxHeight().padding(2.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(2.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
             // Term Selection
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -347,5 +344,4 @@ fun SalePageLeftContent(
                 }
             }
         } // Close left Column
-    } // Close left Card
 }
