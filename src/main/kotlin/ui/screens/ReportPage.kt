@@ -92,15 +92,15 @@ data class StatementRow(
 )
 
 data class SubTotal(
-    val discountAmount: Double = 0.0,
-    val TotalAmountWithDiscount: Double = 0.0,
-    val TotalAmountWithoutDiscount: Double = 0.0,
-    val TotalWinAmountWithoutPrize: Double = 0.0,
-    val TotalTAmountWithoutPrize: Double = 0.0,
-    val TotalAmountWithTPrize: Double = 0.0,
-    val TotalAmountWithPrize: Double = 0.0,
-    val SubTotalAmount: Double = 0.0,
-    val TotalUnitWithDiscount: Double = 0.0
+    val discountAmount: Int = 0,
+    val TotalAmountWithDiscount: Int = 0,
+    val TotalAmountWithoutDiscount: Int = 0,
+    val TotalWinAmountWithoutPrize: Int = 0,
+    val TotalTAmountWithoutPrize: Int = 0,
+    val TotalAmountWithTPrize: Int = 0,
+    val TotalAmountWithPrize: Int = 0,
+    val SubTotalAmount: Int = 0,
+    val TotalUnitWithDiscount: Int = 0
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -222,7 +222,7 @@ fun SettlementsContent() {
                                 LedgerRow(
                                     number = reportData.number ?: "",
                                     winNum = reportData.winNum ?: "",
-                                    amount = reportData.amount ?: 0.0,
+                                    amount = reportData.amount?.toInt() ?: 0,
                                     discount2D = reportData.discount2D ?: 0,
                                     discount3D = reportData.discount3D ?: 0,
                                     prize2D = reportData.prize2D ?: 0,
@@ -370,14 +370,14 @@ fun SettlementsContent() {
         if (statement.isNotEmpty()) {
             val totals = statement.fold(SubTotal()) { acc, row ->
                 SubTotal(
-                    discountAmount = acc.discountAmount + (row.discountAmount.toDoubleOrNull() ?: 0.0),
-                    TotalAmountWithDiscount = acc.TotalAmountWithDiscount + (row.TotalAmountWithDiscount.toDoubleOrNull() ?: 0.0),
-                    TotalAmountWithoutDiscount = acc.TotalAmountWithoutDiscount + (row.TotalAmountWithoutDiscount.toDoubleOrNull() ?: 0.0),
-                    TotalWinAmountWithoutPrize = acc.TotalWinAmountWithoutPrize + (row.TotalWinAmountWithoutPrize.toDoubleOrNull() ?: 0.0),
-                    TotalTAmountWithoutPrize = acc.TotalTAmountWithoutPrize + (row.TotalTAmountWithoutPrize.toDoubleOrNull() ?: 0.0),
-                    TotalAmountWithPrize = acc.TotalAmountWithPrize + (row.TotalAmountWithPrize.toDoubleOrNull() ?: 0.0),
-                    SubTotalAmount = acc.SubTotalAmount + (row.SubTotalAmount.toDoubleOrNull() ?: 0.0),
-                    TotalUnitWithDiscount = acc.TotalUnitWithDiscount + (row.TotalUnitWithDiscount.toDoubleOrNull() ?: 0.0)
+                    discountAmount = acc.discountAmount + (row.discountAmount.toDoubleOrNull() ?: 0.0).toInt(),
+                    TotalAmountWithDiscount = acc.TotalAmountWithDiscount + (row.TotalAmountWithDiscount.toDoubleOrNull() ?: 0.0).toInt(),
+                    TotalAmountWithoutDiscount = acc.TotalAmountWithoutDiscount + (row.TotalAmountWithoutDiscount.toDoubleOrNull() ?: 0.0).toInt(),
+                    TotalWinAmountWithoutPrize = acc.TotalWinAmountWithoutPrize + (row.TotalWinAmountWithoutPrize.toDoubleOrNull() ?: 0.0).toInt(),
+                    TotalTAmountWithoutPrize = acc.TotalTAmountWithoutPrize + (row.TotalTAmountWithoutPrize.toDoubleOrNull() ?: 0.0).toInt(),
+                    TotalAmountWithPrize = acc.TotalAmountWithPrize + (row.TotalAmountWithPrize.toDoubleOrNull() ?: 0.0).toInt(),
+                    SubTotalAmount = acc.SubTotalAmount + (row.SubTotalAmount.toDoubleOrNull() ?: 0.0).toInt(),
+                    TotalUnitWithDiscount = acc.TotalUnitWithDiscount + (row.TotalUnitWithDiscount.toDoubleOrNull() ?: 0.0).toInt()
                 )
             }
             subTotal = totals
@@ -633,14 +633,14 @@ fun SimplifiedView(
                 rows = groupedStatements.map { (customer, rows) ->
                 val subtotal = rows.fold(SubTotal()) { acc, row ->
                     SubTotal(
-                        discountAmount = acc.discountAmount + (row.discountAmount.toDoubleOrNull() ?: 0.0),
-                        TotalAmountWithDiscount = acc.TotalAmountWithDiscount + (row.TotalAmountWithDiscount.toDoubleOrNull() ?: 0.0),
-                        TotalAmountWithoutDiscount = acc.TotalAmountWithoutDiscount + (row.TotalAmountWithoutDiscount.toDoubleOrNull() ?: 0.0),
-                        TotalWinAmountWithoutPrize = acc.TotalWinAmountWithoutPrize + (row.TotalWinAmountWithoutPrize.toDoubleOrNull() ?: 0.0),
-                        TotalTAmountWithoutPrize = acc.TotalTAmountWithoutPrize + (row.TotalTAmountWithoutPrize.toDoubleOrNull() ?: 0.0),
-                        TotalAmountWithPrize = acc.TotalAmountWithPrize + (row.TotalAmountWithPrize.toDoubleOrNull() ?: 0.0),
-                        SubTotalAmount = acc.SubTotalAmount + (row.SubTotalAmount.toDoubleOrNull() ?: 0.0),
-                        TotalUnitWithDiscount = acc.TotalUnitWithDiscount + (row.TotalUnitWithDiscount.toDoubleOrNull() ?: 0.0)
+                        discountAmount = acc.discountAmount + (row.discountAmount.toDoubleOrNull() ?: 0.0).toInt(),
+                        TotalAmountWithDiscount = acc.TotalAmountWithDiscount + (row.TotalAmountWithDiscount.toDoubleOrNull() ?: 0.0).toInt(),
+                        TotalAmountWithoutDiscount = acc.TotalAmountWithoutDiscount + (row.TotalAmountWithoutDiscount.toDoubleOrNull() ?: 0.0).toInt(),
+                        TotalWinAmountWithoutPrize = acc.TotalWinAmountWithoutPrize + (row.TotalWinAmountWithoutPrize.toDoubleOrNull() ?: 0.0).toInt(),
+                        TotalTAmountWithoutPrize = acc.TotalTAmountWithoutPrize + (row.TotalTAmountWithoutPrize.toDoubleOrNull() ?: 0.0).toInt(),
+                        TotalAmountWithPrize = acc.TotalAmountWithPrize + (row.TotalAmountWithPrize.toDoubleOrNull() ?: 0.0).toInt(),
+                        SubTotalAmount = acc.SubTotalAmount + (row.SubTotalAmount.toDoubleOrNull() ?: 0.0).toInt(),
+                        TotalUnitWithDiscount = acc.TotalUnitWithDiscount + (row.TotalUnitWithDiscount.toDoubleOrNull() ?: 0.0).toInt()
                     )
                 }
                 

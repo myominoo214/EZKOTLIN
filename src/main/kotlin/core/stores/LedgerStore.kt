@@ -191,7 +191,7 @@ class LedgerStore private constructor() {
         return _state.value.loading
     }
     
-    fun getTotalAmount(): Double {
+    fun getTotalAmount(): Int {
         return _state.value.filteredData.sumOf { it.totalAmount }
     }
     
@@ -228,9 +228,9 @@ class LedgerStore private constructor() {
                 val ledgerItems = response.data.data.by.map { apiData: LedgerApiData ->
                     LedgerItem(
                         number = apiData.number ?: "",
-                        totalAmount = apiData.TotalAmount ?: 0.0,
+                        totalAmount = apiData.TotalAmount ?: 0,
                         customer = apiData.customer ?: "",
-                        amount = apiData.amount ?: 0.0,
+                        amount = apiData.amount ?: 0,
                         slipId = apiData.slipId ?: ""
                     )
                 }

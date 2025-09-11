@@ -602,11 +602,11 @@ class ApiService {
     
     @Serializable
     data class StatementData(
-        val TotalUnitWithDiscount: Double = 0.0,
-        val TotalAmountWithoutDiscount: Double = 0.0,
-        val TotalWinAmountWithoutPrize: Double = 0.0,
-        val TotalAmountWithPrize: Double = 0.0,
-        val SubTotalAmount: Double = 0.0
+        val TotalUnitWithDiscount: Int = 0,
+        val TotalAmountWithoutDiscount: Int = 0,
+        val TotalWinAmountWithoutPrize: Int = 0,
+        val TotalAmountWithPrize: Int = 0,
+        val SubTotalAmount: Int = 0
     )
     
     suspend fun deleteSlipItem(itemId: String, slipId: String, termId: Int, userId: Int): ApiResponse<SlipResponse> {
@@ -793,7 +793,7 @@ class ApiService {
         val termType: String,
         val winNum: String,
         //val is2D: Int,
-        val unitPrice: Double,
+        val unitPrice: Int,
         @Serializable(with = BreakAmountSerializer::class)
         val breakAmount: Int
     )
@@ -878,9 +878,9 @@ class ApiService {
                 prize2D = userData.prize2D.toIntOrNull(),
                 prize3D = userData.prize3D.toIntOrNull(),
                 tPrize = userData.tPrize.toIntOrNull(),
-                breakLimit2D = userData.breakLimit2D.toDoubleOrNull(),
-                breakLimit3D = userData.breakLimit3D.toDoubleOrNull(),
-                unitPrice = userData.unitPrice.toDoubleOrNull(),
+                breakLimit2D = userData.breakLimit2D.toIntOrNull(),
+                breakLimit3D = userData.breakLimit3D.toIntOrNull(),
+                unitPrice = userData.unitPrice.toIntOrNull(),
                 hotBreak = if (userData.betType == BetType.AMOUNT) userData.hotBreak.toIntOrNull() else null,
                 hotPercentage = if (userData.betType == BetType.PERCENTAGE) userData.hotPercentage.toIntOrNull() else null,
                 hotBreak3D = if (userData.betType3D == BetType.AMOUNT) userData.hotBreak3D.toIntOrNull() else null,
@@ -930,9 +930,9 @@ class ApiService {
                 prize2D = userData.prize2D.toIntOrNull(),
                 prize3D = userData.prize3D.toIntOrNull(),
                 tPrize = userData.tPrize.toIntOrNull(),
-                breakLimit2D = userData.breakLimit2D.toDoubleOrNull(),
-                breakLimit3D = userData.breakLimit3D.toDoubleOrNull(),
-                unitPrice = userData.unitPrice.toDoubleOrNull(),
+                breakLimit2D = userData.breakLimit2D.toIntOrNull(),
+                breakLimit3D = userData.breakLimit3D.toIntOrNull(),
+                unitPrice = userData.unitPrice.toIntOrNull(),
                 hotBreak = if (userData.betType == BetType.AMOUNT) userData.hotBreak.toIntOrNull() else null,
                 hotPercentage = if (userData.betType == BetType.PERCENTAGE) userData.hotPercentage.toIntOrNull() else null,
                 hotBreak3D = if (userData.betType3D == BetType.AMOUNT) userData.hotBreak3D.toIntOrNull() else null,
@@ -1036,16 +1036,16 @@ class ApiService {
                     ui.screens.SaleTerm(
                         termId = "1",
                         termName = "Morning Term",
-                        unitPrice = 100.0,
-                        breakAmount = 1000.0,
+                        unitPrice = 100,
+                        breakAmount = 1000,
                         is2D = "1",
                         termType = "regular"
                     ),
                     ui.screens.SaleTerm(
                         termId = "2",
                         termName = "Evening Term",
-                        unitPrice = 100.0,
-                        breakAmount = 1500.0,
+                        unitPrice = 100,
+                        breakAmount = 1500,
                         is2D = "0",
                         termType = "regular"
                     )
@@ -1123,8 +1123,8 @@ class ApiService {
             val apiUserData = nestedResponse.data.by.map { user ->
                 ui.screens.ApiUserData(
                     userId = user.userId,
-                    discount2D = 0.0, // Default values since this data isn't in user lists
-                    discount3D = 0.0
+                    discount2D = 0, // Default values since this data isn't in user lists
+                    discount3D = 0
                 )
             }
             ui.screens.ApiResponse(
@@ -1138,7 +1138,7 @@ class ApiService {
                 code = "200",
                 message = "Success (Fallback)",
                 data = listOf(
-                    ui.screens.ApiUserData(userId = "1", discount2D = 0.1, discount3D = 0.15)
+                    ui.screens.ApiUserData(userId = "1", discount2D = 0, discount3D = 0)
                 )
             )
         }
@@ -1289,7 +1289,7 @@ data class User(
 data class Product(
     val id: Int? = null,
     val name: String,
-    val price: Double,
+    val price: Int,
     val description: String? = null
 )
 

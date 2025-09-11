@@ -73,8 +73,8 @@ import core.stores.LedgerStore
 data class SaleTerm(
     val termId: String,
     val termName: String,
-    val unitPrice: Double,
-    val breakAmount: Double,
+    val unitPrice: Int,
+    val breakAmount: Int,
     val is2D: String,
     val termType: String,
     val shareOption: String? = null
@@ -140,8 +140,8 @@ data class SalePageState(
     val employeeName: String = "",
     val bettedUnits: String = "0",
     val totalUnit: Int = 0,
-    val breakAmount: Double = 0.0,
-    val unitPrice: Double = 0.0,
+    val breakAmount: Int = 0,
+    val unitPrice: Int = 0,
     val is2D: Boolean = true,
     val sendSMS: Boolean = false,
     val isPrintingEnabled: Boolean = false,
@@ -647,8 +647,8 @@ class SalePageViewModel(
                     val apiUserData = usersResponse.data.map { user ->
                         ApiUserData(
                             userId = user.userId,
-                            discount2D = user.discount2D.toDouble() / 100.0, // Convert from percentage to decimal
-                            discount3D = user.discount3D.toDouble() / 100.0  // Convert from percentage to decimal
+                            discount2D = user.discount2D,
+                            discount3D = user.discount3D
                         )
                     }
                     // Update global state store with user options

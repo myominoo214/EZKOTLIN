@@ -191,7 +191,7 @@ fun TermSelectionComponent(
                         termType = termData.termType,
                         winNum = termData.winNum,
                         is2D = termData.is2D,
-                        unitPrice = termData.unitPrice.toDouble(),
+                        unitPrice = termData.unitPrice,
                         breakAmount = termData.breakAmount
                     )
                 }

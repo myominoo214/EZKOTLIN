@@ -27,8 +27,8 @@ data class LedgerRow(
     val number: String? = null,
     val winNum: String? = null,
     val tNumbers: List<String>? = null,
-    val amount: Double = 0.0,
-    val tUnitPrice: Double? = null,
+    val amount: Int = 0,
+    val tUnitPrice: Int? = null,
     val discount2D: Int? = null,
     val discount3D: Int? = null,
     val agentDisount2D: Int? = null,
@@ -63,14 +63,14 @@ private data class BucketGroup(
     val userId: String,
     val termId: String,
     val termName: String,
-    var discountAmount: Double = 0.0,
-    var totalAmountWithDiscount: Double = 0.0,
-    var totalUnitWithDiscount: Double = 0.0,
-    var totalAmountWithoutDiscount: Double = 0.0,
-    var totalWinAmountWithoutPrize: Double = 0.0,
-    var totalTAmountWithoutPrize: Double = 0.0,
-    var totalAmountWithPrize: Double = 0.0,
-    var subTotalAmount: Double = 0.0
+    var discountAmount: Int = 0,
+    var totalAmountWithDiscount: Int = 0,
+    var totalUnitWithDiscount: Int = 0,
+    var totalAmountWithoutDiscount: Int = 0,
+    var totalWinAmountWithoutPrize: Int = 0,
+    var totalTAmountWithoutPrize: Int = 0,
+    var totalAmountWithPrize: Int = 0,
+    var subTotalAmount: Int = 0
 )
 
 /**
@@ -124,13 +124,13 @@ fun aggregateStatementReport(
             else -> 0.0
         }
         
-        val amtValue = row.amount * (row.tUnitPrice ?: 1.0)
+        val amtValue = row.amount * (row.tUnitPrice?.toDouble() ?: 1.0)
         val discAmount = amtValue * rate
         val winPrize = if (isHit) {
-            (if (is2D) row.prize2D.toDouble() else row.prize3D.toDouble()) * row.amount * (row.tUnitPrice ?: 1.0)
+            (if (is2D) row.prize2D.toDouble() else row.prize3D.toDouble()) * row.amount * (row.tUnitPrice?.toDouble() ?: 1.0)
         } else 0.0
         val tPrize = if (isTHit) {
-            (row.tPrize?.toDouble() ?: 0.0) * row.amount * (row.tUnitPrice ?: 1.0)
+            (row.tPrize?.toDouble() ?: 0.0) * row.amount * (row.tUnitPrice?.toDouble() ?: 1.0)
         } else 0.0
         val totalPrize = winPrize + tPrize
         
@@ -143,7 +143,7 @@ fun aggregateStatementReport(
             }
             - if (isHit) (if (is2D) row.prize2D.toDouble() else row.prize3D.toDouble()) * row.amount else 0.0
             - if (isTHit) (row.tPrize?.toDouble() ?: 0.0) * row.amount else 0.0
-        ) * (row.tUnitPrice ?: 1.0)
+        ) * (row.tUnitPrice?.toDouble() ?: 1.0)
         
         // Choose name vs customer depending on role
         val displayName = if (role == "owner" || (role == "agent" && currentUser != row.userId)) {
@@ -164,29 +164,29 @@ fun aggregateStatementReport(
         }
         
         val g = bucket[key]!!
-        g.discountAmount += discAmount
-        g.totalAmountWithDiscount += amtValue
+        g.discountAmount += discAmount.toInt()
+        g.totalAmountWithDiscount += amtValue.toInt()
         g.totalUnitWithDiscount += row.amount
-        g.totalAmountWithoutDiscount += amtValue - discAmount
-        g.totalWinAmountWithoutPrize += if (isHit) row.amount else 0.0
-        g.totalTAmountWithoutPrize += if (isTHit) row.amount else 0.0
-        g.totalAmountWithPrize += totalPrize
-        g.subTotalAmount += subTotal
+        g.totalAmountWithoutDiscount += (amtValue - discAmount).toInt()
+        g.totalWinAmountWithoutPrize += if (isHit) row.amount else 0
+        g.totalTAmountWithoutPrize += if (isTHit) row.amount else 0
+        g.totalAmountWithPrize += totalPrize.toInt()
+        g.subTotalAmount += subTotal.toInt()
     }
     
     // Final MySQL-style formatting & stable sort
     return bucket.values
         .map { g ->
             StatementSummary(
-                SubTotalAmount = String.format("%.6f", g.subTotalAmount),
-                TotalAmountWithDiscount = String.format("%.2f", g.totalAmountWithDiscount),
-                TotalAmountWithPrize = String.format("%.6f", g.totalAmountWithPrize),
-                TotalAmountWithoutDiscount = String.format("%.2f", g.totalAmountWithoutDiscount),
-                TotalTAmountWithoutPrize = kotlin.math.round(g.totalTAmountWithoutPrize).toInt().toString(),
-                TotalUnitWithDiscount = String.format("%.2f", g.totalUnitWithDiscount),
-                TotalWinAmountWithoutPrize = kotlin.math.round(g.totalWinAmountWithoutPrize).toInt().toString(),
+                SubTotalAmount = String.format("%.6f", g.subTotalAmount.toDouble()),
+                TotalAmountWithDiscount = String.format("%.2f", g.totalAmountWithDiscount.toDouble()),
+                TotalAmountWithPrize = String.format("%.6f", g.totalAmountWithPrize.toDouble()),
+                TotalAmountWithoutDiscount = String.format("%.2f", g.totalAmountWithoutDiscount.toDouble()),
+                TotalTAmountWithoutPrize = g.totalTAmountWithoutPrize.toString(),
+                TotalUnitWithDiscount = String.format("%.2f", g.totalUnitWithDiscount.toDouble()),
+                TotalWinAmountWithoutPrize = g.totalWinAmountWithoutPrize.toString(),
                 customer = g.customer,
-                discountAmount = String.format("%.2f", g.discountAmount),
+                discountAmount = String.format("%.2f", g.discountAmount.toDouble()),
                 termId = g.termId,
                 termName = g.termName,
                 userId = g.userId

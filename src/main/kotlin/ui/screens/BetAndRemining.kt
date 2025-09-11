@@ -22,8 +22,8 @@ import kotlinx.serialization.Serializable
 // Data Models
 @Serializable
 data class BettedAndRemainder(
-    val remainderAmount: Double? = null,
-    val bettedAmount: Double? = null
+    val remainderAmount: Int? = null,
+    val bettedAmount: Int? = null
 )
 
 @Serializable

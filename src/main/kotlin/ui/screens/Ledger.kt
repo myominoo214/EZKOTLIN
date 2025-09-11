@@ -188,7 +188,7 @@ fun Ledger(
                         termType = "",
                         winNum = "",
                         //is2D = 0,
-                        unitPrice = 0.0,
+                        unitPrice = 0,
                         breakAmount = newAmount
                     )
                     val response = apiService.updateTerm(updateRequest)
@@ -271,7 +271,7 @@ fun Ledger(
                             number = customerData.number ?: ledgerItem.number,
                             totalAmount = ledgerItem.totalAmount,
                             customer = customerData.customer ?: "",
-                            amount = customerData.amount ?: 0.0,
+                            amount = customerData.amount ?: 0,
                             slipId = customerData.slipId ?: "",
                             createdAt = ledgerItem.createdAt
                         )
@@ -612,22 +612,22 @@ fun Ledger(
                         modifier = Modifier.weight(1f),
                         is2D = is2D,
                         ledgerData = ledgerStoreState.filteredData,
-                        breakAmount = state.breakAmount.toDouble(),
+                        breakAmount = state.breakAmount,
                         handleRowClick = { ledgerItem -> handleLedgerTableClick(ledgerItem) },
                         setExtraData = { extraData: List<FormatData> ->
                             state = state.copy(extraData = extraData.map { formatData: FormatData ->
-                                val amount = formatData.amount.toDoubleOrNull() ?: 0.0
+                                val amount = formatData.amount.toIntOrNull() ?: 0
                                 LedgerItem(formatData.number, amount, "", amount) 
                             })
                         },
                         setUnitData = { unitData: List<FormatData> ->
                             state = state.copy(unitData = unitData.map { formatData: FormatData ->
-                                val amount = formatData.amount.toDoubleOrNull() ?: 0.0
+                                val amount = formatData.amount.toIntOrNull() ?: 0
                                 LedgerItem(formatData.number, amount, "", amount) 
                             })
                         },
                         toTop = "",
-                        tempBreakAmount = state.tempBreakAmount.toDoubleOrNull() ?: 0.0,
+                        tempBreakAmount = state.tempBreakAmount.toIntOrNull() ?: 0,
                         isTempBreak = state.temporaryBreakAmountCheck
                     )
                 }
@@ -636,14 +636,14 @@ fun Ledger(
                 ){
                     val totalUnit = state.ledgerData.sumOf { item ->
                         val total = item.totalAmount
-                        val cap = state.breakAmount.toDouble()
-                        if (total <= 0) 0.0 else minOf(total, cap)
+                        val cap = state.breakAmount
+                        if (total <= 0) 0 else minOf(total, cap)
                     }
                     
                     val totalExtra = state.ledgerData.sumOf { item ->
                         val total = item.totalAmount
-                        val cap = state.breakAmount.toDouble()
-                        if (total > cap) total - cap else 0.0
+                        val cap = state.breakAmount
+                        if (total > cap) total - cap else 0
                     }
                     
                     val percentage = if (state.breakAmount > 0) {

@@ -293,7 +293,7 @@ fun ActionButtonsSection(
 @Composable
 fun TotalMessage(
     is2D: Boolean = true,
-    unitPrice: Double = 0.0,
+    unitPrice: Int = 0,
     onDismiss: () -> Unit = {},
     onSubmit: (List<TotalLotteryEntry>) -> Unit = {}
 ) {

@@ -16,15 +16,15 @@ data class User(
 @Serializable
 data class ApiUserData(
     val userId: String,
-    val discount2D: Double,
-    val discount3D: Double
+    val discount2D: Int,
+    val discount3D: Int
 )
 
 data class LedgerItem(
     val number: String,
-    val totalAmount: Double,
+    val totalAmount: Int,
     val customer: String = "",
-    val amount: Double = 0.0,
+    val amount: Int = 0,
     val slipId: String = "",
     val createdAt: LocalDateTime = LocalDateTime.now()
 )
@@ -32,9 +32,9 @@ data class LedgerItem(
 @Serializable
 data class LedgerApiData(
     val number: String? = null,
-    val TotalAmount: Double? = null,
+    val TotalAmount: Int? = null,
     val customer: String? = null,
-    val amount: Double? = null,
+    val amount: Int? = null,
     val slipId: String? = null
 )
 
@@ -62,7 +62,7 @@ data class PrizeApiResponseData(
 @Serializable
 data class CustomerApiData(
     val customer: String? = null,
-    val amount: Double? = null,
+    val amount: Int? = null,
     val number: String? = null,
     val createdAt: String? = null,
     val slipId: String? = null

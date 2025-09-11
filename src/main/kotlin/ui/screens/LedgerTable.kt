@@ -26,8 +26,8 @@ import kotlin.math.min
 
 data class PreparedDataItem(
     val number: String,
-    val unit: Double,
-    val extra: Double,
+    val unit: Int,
+    val extra: Int,
     val original: LedgerItem
 )
 
@@ -46,12 +46,12 @@ fun LedgerTableComponent(
     modifier: Modifier = Modifier,
     is2D: Boolean,
     ledgerData: List<LedgerItem>,
-    breakAmount: Double,
+    breakAmount: Int,
     handleRowClick: (LedgerItem) -> Unit,
     setExtraData: (List<FormatData>) -> Unit,
     setUnitData: (List<FormatData>) -> Unit,
     toTop: String,
-    tempBreakAmount: Double,
+    tempBreakAmount: Int,
     isTempBreak: Boolean
 ) {
     var sortColumn by remember { mutableStateOf(SortColumn.UNIT) }
@@ -76,12 +76,12 @@ fun LedgerTableComponent(
         
         val prepared = numberList.map { number ->
             val ledger = ledgerData.find { it.number == number }
-            val totalAmount = ledger?.totalAmount ?: 0.0
+            val totalAmount = ledger?.totalAmount ?: 0
             PreparedDataItem(
                 number = number,
                 unit = min(totalAmount, effectiveBreakAmount),
-                extra = max(totalAmount - effectiveBreakAmount, 0.0),
-                original = ledger ?: LedgerItem(number, 0.0)
+                extra = max(totalAmount - effectiveBreakAmount, 0),
+                original = ledger ?: LedgerItem(number, 0)
             )
         }
         
@@ -251,8 +251,8 @@ fun LedgerTableComponent(
                 modifier = Modifier.fillMaxSize()
             ) {
                 itemsIndexed(sortedData) { index, data ->
-                    val backgroundColor = getRowBackgroundColor(data.original.totalAmount)
-                    val textColor = getRowTextColor(data.original.totalAmount)
+                    val backgroundColor = getRowBackgroundColor(data.original.totalAmount.toDouble())
+                    val textColor = getRowTextColor(data.original.totalAmount.toDouble())
                     
                     Row(
                         modifier = Modifier

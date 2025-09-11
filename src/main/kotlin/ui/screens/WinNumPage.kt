@@ -42,13 +42,13 @@ data class WinnerData(
     val userId: String,
     val customer: String,
     val name: String,
-    val amount: Double,
-    val TotalAmountWithPrize: Double? = null,
-    val TotalTAmountWithPrize: Double? = null,
+    val amount: Int,
+    val TotalAmountWithPrize: Int? = null,
+    val TotalTAmountWithPrize: Int? = null,
     val prize2D: Int,
     val prize3D: Int,
     val tPrize: Int,
-    val unitPrice: Double? = null,
+    val unitPrice: Int? = null,
     val createdAt: String
 )
 
@@ -67,9 +67,9 @@ data class WinnerResponseData(
 
 @Serializable
 data class SubTotalData(
-    val amount: Double = 0.0,
-    val TotalAmountWithPrize: Double = 0.0,
-    val TotalTAmountWithPrize: Double = 0.0
+    val amount: Int = 0,
+    val TotalAmountWithPrize: Int = 0,
+    val TotalTAmountWithPrize: Int = 0
 )
 
 @Composable
@@ -89,7 +89,7 @@ fun WinNumContent() {
 
     var winNum by remember { mutableStateOf<String?>(null) }
     var is2D by remember { mutableStateOf(true) }
-    var unitPrice by remember { mutableStateOf(1.0) }
+    var unitPrice by remember { mutableStateOf(1) }
     var prizes by remember { mutableStateOf<List<Int>>(emptyList()) }
     var selectedPrize by remember { mutableStateOf<Int?>(null) }
     var subTotal by remember { mutableStateOf<SubTotalData?>(null) }
@@ -181,7 +181,7 @@ fun WinNumContent() {
                             termType = term.termType,
                             winNum = term.winNum,
                             is2D = term.is2D,
-                            unitPrice = term.unitPrice.toDouble()
+                            unitPrice = term.unitPrice
                         )
                     }
                 } else {
@@ -268,15 +268,15 @@ fun WinNumContent() {
                             val t = tMap[key]
                             val base = win ?: t!!
                             
-                            val totalWinAmount = win?.amount ?: 0.0
-                            val totalTAmount = t?.amount ?: 0.0
+                            val totalWinAmount = win?.amount ?: 0
+                            val totalTAmount = t?.amount ?: 0
                             
                             val safeUnitPrice = base.unitPrice ?: unitPrice
                             val finalAmount = if (is2D) {
                                 totalWinAmount * base.prize2D * safeUnitPrice
                             } else {
                                 (totalWinAmount * base.prize3D * safeUnitPrice) + 
-                                (totalTAmount * base.tPrize.toDouble() * safeUnitPrice)
+                                (totalTAmount * base.tPrize * safeUnitPrice)
                             }
                             
                             base.copy(
@@ -299,8 +299,8 @@ fun WinNumContent() {
                         // Calculate subtotals
                         val totals = SubTotalData(
                             amount = combinedResults.sumOf { result: WinnerData -> result.amount },
-                            TotalAmountWithPrize = combinedResults.sumOf { result: WinnerData -> result.TotalAmountWithPrize ?: 0.0 },
-                            TotalTAmountWithPrize = combinedResults.sumOf { result: WinnerData -> result.TotalTAmountWithPrize ?: 0.0 }
+                            TotalAmountWithPrize = combinedResults.sumOf { result: WinnerData -> result.TotalAmountWithPrize ?: 0 },
+                            TotalTAmountWithPrize = combinedResults.sumOf { result: WinnerData -> result.TotalTAmountWithPrize ?: 0 }
                         )
                         subTotal = totals
                         
@@ -340,8 +340,8 @@ fun WinNumContent() {
         // Recalculate subtotals for filtered data
         val totals = SubTotalData(
             amount = winners.sumOf { it.amount },
-            TotalAmountWithPrize = winners.sumOf { it.TotalAmountWithPrize ?: 0.0 },
-            TotalTAmountWithPrize = winners.sumOf { it.TotalTAmountWithPrize ?: 0.0 }
+            TotalAmountWithPrize = winners.sumOf { it.TotalAmountWithPrize ?: 0 },
+            TotalTAmountWithPrize = winners.sumOf { it.TotalTAmountWithPrize ?: 0 }
         )
         subTotal = totals
     }

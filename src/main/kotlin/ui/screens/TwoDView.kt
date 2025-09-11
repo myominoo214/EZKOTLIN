@@ -75,9 +75,9 @@ data class TwoDViewState(
     val number2DError: String? = null,
     val unitPriceError: String? = null,
     val payMoney: String = "",
-    val remainAmount: Double = 0.0,
-    val discount: Double = 0.0,
-    val totalAmount: Double = 0.0,
+    val remainAmount: Int = 0,
+    val discount: Int = 0,
+    val totalAmount: Int = 0,
     val isModalOpen: Boolean = false,
     val hotList: List<String> = emptyList()
 )
@@ -155,13 +155,13 @@ class TwoDViewModel {
         )
     }
     
-    fun updatePayMoney(value: String, unitPrice: Double, tempListStore: TempListStore? = null) {
+    fun updatePayMoney(value: String, unitPrice: Int, tempListStore: TempListStore? = null) {
         val currentState = _state.value
-        val totalUnit = tempListStore?.getTotalAmount()?.toDouble() ?: 0.0
+        val totalUnit = tempListStore?.getTotalAmount()?.toInt() ?: 0
         val totalAmount = totalUnit * unitPrice
         val discountAmount = totalAmount * currentState.discount / 100
         val finalAmount = totalAmount - discountAmount
-        val remainAmount = finalAmount - (value.toDoubleOrNull() ?: 0.0)
+        val remainAmount = finalAmount - (value.toIntOrNull() ?: 0)
         
         _state.value = currentState.copy(
             payMoney = value,
@@ -613,7 +613,7 @@ class TwoDViewModel {
                     if (rMatch != null) {
                         val number = rMatch.groupValues[1]
                         val convertedUnitPrice = "${number}r${number}"
-                        val numberEntries = NumberUtil.processPatternRUnit(number, amount.toDouble(), uniqueID.toString())
+                        val numberEntries = NumberUtil.processPatternRUnit(number, amount, uniqueID.toString())
                         numberEntries.forEach { entry ->
                             entries.add(BetEntry(
                                 entry.number,
@@ -627,7 +627,7 @@ class TwoDViewModel {
                 }
                 
                 rule.matches(Regex("^\\d+r\\d+$", RegexOption.IGNORE_CASE)) -> {
-                    val numberEntries = NumberUtil.processPatternRUnit(rule.replace("r", "", ignoreCase = true), amount.toDouble(), uniqueID.toString())
+                    val numberEntries = NumberUtil.processPatternRUnit(rule.replace("r", "", ignoreCase = true), amount, uniqueID.toString())
                     numberEntries.forEach { entry ->
                         entries.add(BetEntry(
                             entry.number,
@@ -729,17 +729,17 @@ class TwoDViewModel {
         val discount = user?.let { u ->
             val userData = apiUserData.find { it.userId == u.userId }
             val discountValue = if (is2D) {
-                userData?.discount2D ?: 0.0
+                userData?.discount2D ?: 0
             } else {
-                userData?.discount3D ?: 0.0
+                userData?.discount3D ?: 0
             }
             discountValue
-        } ?: 0.0
+        } ?: 0
         
         _state.value = _state.value.copy(discount = discount)
     }
     
-    fun calculateRemainingUnit(ledgerStore: LedgerStore, breakAmount: Double, tempListStore: TempListStore? = null) {
+    fun calculateRemainingUnit(ledgerStore: LedgerStore, breakAmount: Int, tempListStore: TempListStore? = null) {
         val currentState = _state.value
         val unitValue = currentState.number2D
         
@@ -755,14 +755,14 @@ class TwoDViewModel {
             
             val totalLedgerUnit = ledgerStoreState.filteredData
                 .find { it.number == number2D }
-                ?.totalAmount ?: 0.0
+                ?.totalAmount ?: 0
             
             println("[DEBUG] Found totalLedgerUnit: $totalLedgerUnit for number2D: $number2D")
             
             // Calculate total list unit from temp store for the current number
             val totalListUnit = tempListStore?.getItems()
                 ?.filter { it.number == number2D }
-                ?.sumOf { it.amount.toDoubleOrNull() ?: 0.0 } ?: 0.0
+                ?.sumOf { it.amount.toIntOrNull() ?: 0 } ?: 0
             
             println("[DEBUG] TempListStore items for number $number2D: ${tempListStore?.getItems()?.filter { it.number == number2D }}")
             println("[DEBUG] Found totalListUnit: $totalListUnit for number2D: $number2D")
@@ -787,8 +787,8 @@ class TwoDViewModel {
 fun TwoDView(
     termId: String?,
     user: User?,
-    unitPrice: Double,
-    breakAmount: Double,
+    unitPrice: Int,
+    breakAmount: Int,
     playFailSong: () -> Unit,
     playSuccessSong: () -> Unit,
     playDuplicateSong: () -> Unit,
@@ -1007,7 +1007,7 @@ fun TwoDView(
                     fontSize = 16.sp,
                     modifier = Modifier.width(100.dp)
                 )
-                val discountAmount = (((tempListStore.getTotalAmount().toDouble() * unitPrice) * state.discount)).roundToInt()
+                val discountAmount = (((tempListStore.getTotalAmount() * unitPrice) * state.discount).toDouble()).roundToInt()
                 CustomTextField(
                     value = discountAmount.toString(),
                     onValueChange = { },

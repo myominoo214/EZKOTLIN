@@ -74,7 +74,7 @@ fun SalePageLeftContent(
                         termType = "regular",
                         winNum = null,
                         is2D = true,
-                        unitPrice = 1.0,
+                        unitPrice = 1,
                         breakAmount = 0
                     )
                 }

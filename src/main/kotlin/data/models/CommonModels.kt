@@ -40,7 +40,7 @@ data class TermOption(
     val winNum: String? = null,
     @Serializable(with = BooleanAsStringSerializer::class)
     val is2D: Boolean = true,
-    val unitPrice: Double = 1.0,
+    val unitPrice: Int = 1,
     val breakAmount: Int = 0
 )
 
@@ -64,7 +64,7 @@ data class TermData(
     val winNum: String? = null,
     @Serializable(with = BooleanAsStringSerializer::class)
     val is2D: Boolean = true,
-    val unitPrice: Double = 1.0,
+    val unitPrice: Int = 1,
     val breakAmount: Int = 0
 )
 
@@ -157,15 +157,15 @@ data class LedgerRow(
     val id: String,
     val date: String,
     val description: String,
-    val amount: Double,
-    val balance: Double
+    val amount: Int,
+    val balance: Int
 )
 
 @Serializable
 data class StatementSummary(
-    val totalIncome: Double,
-    val totalExpense: Double,
-    val netAmount: Double,
+    val totalIncome: Int,
+    val totalExpense: Int,
+    val netAmount: Int,
     val period: String
 )
 
@@ -174,7 +174,7 @@ data class LotteryEntry(
     val id: String,
     val numbers: List<Int>,
     val date: String,
-    val amount: Double
+    val amount: Int
 )
 
 @Serializable

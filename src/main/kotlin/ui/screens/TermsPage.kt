@@ -986,7 +986,7 @@ fun TermsContent() {
                             termType = termData.termType,
                             winNum = termData.winNum.toString(),
                             //is2D = termData.is2D.toIntOrNull() ?: 0,
-                            unitPrice = termData.unitPrice.toDouble(),
+                            unitPrice = termData.unitPrice,
                             breakAmount = termData.breakAmount
                         )
                         println("[DEBUG] Term update: '${updateRequest}'")

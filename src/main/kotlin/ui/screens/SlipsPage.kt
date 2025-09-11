@@ -386,7 +386,7 @@ fun SlipsContent(onNavigateToSale: () -> Unit = {}) {
                         termType = termData.termType,
                         winNum = termData.winNum,
                         is2D = termData.is2D,
-                        unitPrice = termData.unitPrice.toDouble()
+                        unitPrice = termData.unitPrice
                     )
                 }
                 if (selectedTermId.isEmpty() && termOptions.isNotEmpty()) {
@@ -650,7 +650,7 @@ fun SlipsContent(onNavigateToSale: () -> Unit = {}) {
     }
     
     // Format currency
-    fun formatCurrency(value: Double?): String {
+    fun formatCurrency(value: Int?): String {
         return if (value != null) {
             NumberFormat.getNumberInstance(Locale.US).format(value)
         } else {

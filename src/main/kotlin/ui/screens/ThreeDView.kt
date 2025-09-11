@@ -63,10 +63,10 @@ data class ThreeDViewState(
     val number3DError: String? = null,
     val unitPriceError: String? = null,
     val payMoney: String = "",
-    val remainAmount: Double = 0.0,
+    val remainAmount: Int = 0,
     val totalUnit: Int = 0,
-    val discount: Double = 0.0,
-    val totalAmount: Double = 0.0,
+    val discount: Int = 0,
+    val totalAmount: Int = 0,
     val isModalOpen: Boolean = false,
     val hotList: List<String> = emptyList(),
     val listItems: List<ThreeDEntry> = emptyList()
@@ -368,12 +368,12 @@ class ThreeDViewModel {
         )
     }
     
-    fun updatePayMoney(value: String, unitPrice: Double, tempListStore: TempListStore? = null) {
+    fun updatePayMoney(value: String, unitPrice: Int, tempListStore: TempListStore? = null) {
         val currentState = _state.value
-        val totalAmount = tempListStore?.getTotalAmount()?.toDouble()?.times(unitPrice) ?: (currentState.totalUnit * unitPrice)
+        val totalAmount = (tempListStore?.getTotalAmount() ?: currentState.totalUnit) * unitPrice
         val discountAmount = (totalAmount * currentState.discount)
         val finalAmount = totalAmount - discountAmount
-        val remainAmount = finalAmount - (value.toDoubleOrNull() ?: 0.0)
+        val remainAmount = finalAmount - (value.toIntOrNull() ?: 0)
         
         _state.value = currentState.copy(
             payMoney = value,
@@ -608,7 +608,7 @@ class ThreeDViewModel {
                         entries.addAll(NumberUtil.process3DRRule(match2.groupValues[1], uniqueID.toString(), uPrice).map {
                             ThreeDEntry(
                                 number = it.number,
-                                amount = it.amount.toInt(),
+                                amount = it.amount,
                                 summary = it.summary,
                                 showSummary = it.showSummary,
                                 groupId = it.groupId.toInt()
@@ -741,8 +741,8 @@ class ThreeDViewModel {
     
     fun updateDiscount(user: User?, apiUserData: List<ApiUserData>) {
         val discount = user?.let { u ->
-            apiUserData.find { it.userId == u.userId }?.discount3D ?: 0.0
-        } ?: 0.0
+            apiUserData.find { it.userId == u.userId }?.discount3D ?: 0
+        } ?: 0
         
         _state.value = _state.value.copy(discount = discount)
     }
@@ -750,8 +750,8 @@ class ThreeDViewModel {
 
 @Composable
 fun ThreeDView(
-    unitPrice: Double,
-    breakAmount: Double,
+    unitPrice: Int,
+    breakAmount: Int,
     playFailSong: () -> Unit,
     playSuccessSong: () -> Unit,
     playDuplicateSong: () -> Unit,

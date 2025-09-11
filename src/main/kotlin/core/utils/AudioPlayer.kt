@@ -12,7 +12,7 @@ import java.io.IOException
 class AudioPlayer {
     companion object {
         private var isSongEnabled: Boolean = true
-        private var volume: Float = 1.0f // Default volume (0.0 to 1.0)
+        private var volume: Float = 1f // Default volume (0 to 1)
         
         // Audio file paths - using WAV format for better Java compatibility
         private const val SUCCESS_SONG = "audio/success.wav"
@@ -37,7 +37,7 @@ class AudioPlayer {
          * Set the volume level (0.0 to 1.0)
          */
         fun setVolume(volumeLevel: Float) {
-            volume = volumeLevel.coerceIn(0.0f, 1.0f)
+            volume = volumeLevel.coerceIn(0f, 1f)
         }
         
         /**

@@ -4,7 +4,7 @@ import kotlin.math.pow
 
 data class NumberEntry(
     val number: String,
-    val amount: Double,
+    val amount: Int,
     val summary: String,
     val showSummary: String,
     val groupId: String,
@@ -15,7 +15,7 @@ class NumberUtil {
     
     companion object {
         
-        fun processPatternR(match: String, unitPrice: Double, uniqueID: String): List<NumberEntry> {
+        fun processPatternR(match: String, unitPrice: Int, uniqueID: String): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             val reversedMatch = match.reversed()
             
@@ -44,7 +44,7 @@ class NumberUtil {
             return entries
         }
         
-        fun processPatternRUnit(number: String, unitPrice: Double, uniqueID: String): List<NumberEntry> {
+        fun processPatternRUnit(number: String, unitPrice: Int, uniqueID: String): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             val reversedNumber = number.reversed()
             
@@ -73,7 +73,7 @@ class NumberUtil {
             return entries
         }
         
-        fun processPatternRUnit2(number: String, unitPrice: Double, uniqueID: String): List<NumberEntry> {
+        fun processPatternRUnit2(number: String, unitPrice: Int, uniqueID: String): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             val reversedNumber = number.reversed()
             
@@ -102,7 +102,7 @@ class NumberUtil {
             return entries
         }
         
-        fun processStarN(match: String, unitPrice: Double, uniqueID: String): List<NumberEntry> {
+        fun processStarN(match: String, unitPrice: Int, uniqueID: String): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             
             for (i in 0..9) {
@@ -121,7 +121,7 @@ class NumberUtil {
             return entries
         }
         
-        fun processNStar(match: String, unitPrice: Double, uniqueID: String): List<NumberEntry> {
+        fun processNStar(match: String, unitPrice: Int, uniqueID: String): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             
             for (i in 0..9) {
@@ -140,7 +140,7 @@ class NumberUtil {
             return entries
         }
         
-        fun processTRule(uniqueID: String, unitPrice: Double): List<NumberEntry> {
+        fun processTRule(uniqueID: String, unitPrice: Int): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             val tNumbers = listOf("000", "111", "222", "333", "444", "555", "666", "777", "888", "999")
             
@@ -159,7 +159,7 @@ class NumberUtil {
             return entries
         }
         
-        fun processDoubleNStarRule(digit: String, uniqueID: String, unitPrice: Double): List<NumberEntry> {
+        fun processDoubleNStarRule(digit: String, uniqueID: String, unitPrice: Int): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             
             for (i in 0..9) {
@@ -178,7 +178,7 @@ class NumberUtil {
             return entries
         }
         
-        fun processStartDoubleNRule(digit: String, uniqueID: String, unitPrice: Double): List<NumberEntry> {
+        fun processStartDoubleNRule(digit: String, uniqueID: String, unitPrice: Int): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             
             for (i in 0..9) {
@@ -197,7 +197,7 @@ class NumberUtil {
             return entries
         }
         
-        fun processNStarNRule(digit: String, digit2: String, uniqueID: String, unitPrice: Double): List<NumberEntry> {
+        fun processNStarNRule(digit: String, digit2: String, uniqueID: String, unitPrice: Int): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             
             for (i in 0..9) {
@@ -220,17 +220,17 @@ class NumberUtil {
             val entries = mutableListOf<NumberEntry>()
             
             // Parse unitPrice to handle single value or range
-            val minPrice: Double
-            val maxPrice: Double
+            val minPrice: Int
+            val maxPrice: Int
             val uniqueR: Boolean
             
             if (Regex("[Rr/]").containsMatchIn(unitPrice)) {
-                val prices = unitPrice.split(Regex("[Rr/]")).map { it.toDoubleOrNull() ?: 0.0 }
-                minPrice = prices.getOrNull(0) ?: 0.0
+                val prices = unitPrice.split(Regex("[Rr/]")).map { it.toIntOrNull() ?: 0 }
+                minPrice = prices.getOrNull(0) ?: 0
                 maxPrice = prices.getOrNull(1) ?: minPrice
                 uniqueR = true
             } else {
-                minPrice = unitPrice.toDoubleOrNull() ?: 0.0
+                minPrice = unitPrice.toIntOrNull() ?: 0
                 maxPrice = minPrice
                 uniqueR = false
             }
@@ -254,7 +254,7 @@ class NumberUtil {
             return entries
         }
         
-        fun process3DRRule2(digits: String, uniqueID: String, unitPrice: Double): List<NumberEntry> {
+        fun process3DRRule2(digits: String, uniqueID: String, unitPrice: Int): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             
             // Generate unique permutations
@@ -278,7 +278,7 @@ class NumberUtil {
             return entries
         }
         
-        fun process3DRRRule(digits: String, uniqueID: String, unitPrice: Double): List<NumberEntry> {
+        fun process3DRRRule(digits: String, uniqueID: String, unitPrice: Int): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             
             val permutations = getPermutations(digits).toSet().toList()
@@ -300,7 +300,7 @@ class NumberUtil {
             return entries
         }
         
-        fun processBreakRule(digit: String, uniqueID: String, unitPrice: Double): List<NumberEntry> {
+        fun processBreakRule(digit: String, uniqueID: String, unitPrice: Int): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             
             for (i in 0..999) {
@@ -323,7 +323,7 @@ class NumberUtil {
             return entries
         }
         
-        fun processNP(digit: String, uniqueID: String, unitPrice: Double): List<NumberEntry> {
+        fun processNP(digit: String, uniqueID: String, unitPrice: Int): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             
             for (i in 0..999) {
@@ -362,7 +362,7 @@ class NumberUtil {
             return result
         }
         
-        fun processAPMinus(digit: String, uniqueID: String, unitPrice: Double): List<NumberEntry> {
+        fun processAPMinus(digit: String, uniqueID: String, unitPrice: Int): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             val arr = generateCombinations(digit)
             
@@ -393,7 +393,7 @@ class NumberUtil {
             }
         }
         
-        fun processAP(digit: String, uniqueID: String, unitPrice: Double): List<NumberEntry> {
+        fun processAP(digit: String, uniqueID: String, unitPrice: Int): List<NumberEntry> {
             val entries = mutableListOf<NumberEntry>()
             val arr = generateCombinations(digit)
             
@@ -439,12 +439,12 @@ class NumberUtil {
         }
         
         // Helper function to parse unit price
-        private fun parseUnitPrice(unitPrice: String): Triple<Double, Double, Boolean> {
+        private fun parseUnitPrice(unitPrice: String): Triple<Int, Int, Boolean> {
             return if (Regex("[Rr/]").containsMatchIn(unitPrice)) {
-                val parts = unitPrice.split(Regex("[Rr/]")).map { it.toDouble() }
+                val parts = unitPrice.split(Regex("[Rr/]")).map { it.toInt() }
                 Triple(parts[0], parts[1], true)
             } else {
-                val price = unitPrice.toDouble()
+                val price = unitPrice.toInt()
                 Triple(price, price, false)
             }
         }
