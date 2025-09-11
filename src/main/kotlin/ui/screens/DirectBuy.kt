@@ -337,7 +337,7 @@ fun DirectBuy(
                             expanded = expanded,
                             onExpandedChange = { expanded = !expanded }
                         ) {
-                            OutlinedTextField(
+                            CompactOutlinedTextField(
                                 value = uiState.selectedPartner?.name ?: "",
                                 onValueChange = { },
                                 readOnly = true,
@@ -388,7 +388,7 @@ fun DirectBuy(
                         expanded = expanded,
                         onExpandedChange = { expanded = !expanded }
                     ) {
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = uiState.selectedTerm?.termName ?: "",
                             onValueChange = { },
                             readOnly = true,

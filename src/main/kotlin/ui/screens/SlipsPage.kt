@@ -48,6 +48,7 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.TimeZone
+import core.config.CompactOutlinedTextField
 
 // API Response data classes - using TermsApiResponse from TermsPage.kt
 // Note: SlipTermData is used locally for slip-specific term data
@@ -780,7 +781,7 @@ fun SlipsContent(onNavigateToSale: () -> Unit = {}) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = formatCurrency(report?.TotalUnitWithDiscount),
                             onValueChange = { },
                             label = { Text("ယူနစ်ပေါင်း") },
@@ -788,7 +789,7 @@ fun SlipsContent(onNavigateToSale: () -> Unit = {}) {
                             modifier = Modifier.fillMaxWidth()
                         )
                         
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = formatCurrency(report?.TotalAmountWithoutDiscount),
                             onValueChange = { },
                             label = { Text("ငွေပေါင်း") },
@@ -796,7 +797,7 @@ fun SlipsContent(onNavigateToSale: () -> Unit = {}) {
                             modifier = Modifier.fillMaxWidth()
                         )
                         
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = formatCurrency(report?.TotalWinAmountWithoutPrize),
                             onValueChange = { },
                             label = { Text("ပေါက်သီး") },
@@ -804,7 +805,7 @@ fun SlipsContent(onNavigateToSale: () -> Unit = {}) {
                             modifier = Modifier.fillMaxWidth()
                         )
                         
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = formatCurrency(report?.TotalAmountWithPrize),
                             onValueChange = { },
                             label = { Text("လျော်ကြေး") },
@@ -812,7 +813,7 @@ fun SlipsContent(onNavigateToSale: () -> Unit = {}) {
                             modifier = Modifier.fillMaxWidth()
                         )
                         
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = formatCurrency(report?.SubTotalAmount),
                             onValueChange = { },
                             label = { Text("ပမာဏ") },

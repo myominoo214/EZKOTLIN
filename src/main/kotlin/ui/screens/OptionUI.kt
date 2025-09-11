@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import kotlin.math.floor
 import kotlin.random.Random
+import core.config.CompactOutlinedTextField
 
 // Helper function to generate random key
 fun generateRandomKey(): Int {
@@ -404,16 +405,16 @@ fun OptionUI(
                                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
-                                                OutlinedTextField(
-                                                    value = if (input.breakAmount > 0) input.breakAmount.toString() else "",
-                                                    onValueChange = { value ->
-                                                        handleChangeCut(index, value, "breakAmount")
-                                                    },
-                                                    label = { Text("Break") },
-                                                    enabled = (input.slipId.isNullOrEmpty()) && state.activeCut,
-                                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                                    modifier = Modifier.weight(2f)
-                                                )
+                                                CompactOutlinedTextField(
+                                    value = if (input.breakAmount > 0) input.breakAmount.toString() else "",
+                                    onValueChange = { value ->
+                                        handleChangeCut(index, value, "breakAmount")
+                                    },
+                                    label = { Text("Break") },
+                                    enabled = (input.slipId.isNullOrEmpty()) && state.activeCut,
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    modifier = Modifier.weight(2f)
+                                )
                                                 
                                                 Text(
                                                     text = "if unit>=",
@@ -422,16 +423,16 @@ fun OptionUI(
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
                                                 
-                                                OutlinedTextField(
-                                                    value = if (input.unit > 0) input.unit.toString() else "",
-                                                    onValueChange = { value ->
-                                                        handleChangeCut(index, value, "unit")
-                                                    },
-                                                    label = { Text("Unit") },
-                                                    enabled = (input.slipId.isNullOrEmpty()) && state.activeCut,
-                                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                                    modifier = Modifier.weight(2f)
-                                                )
+                                                CompactOutlinedTextField(
+                                    value = if (input.unit > 0) input.unit.toString() else "",
+                                    onValueChange = { value ->
+                                        handleChangeCut(index, value, "unit")
+                                    },
+                                    label = { Text("Unit") },
+                                    enabled = (input.slipId.isNullOrEmpty()) && state.activeCut,
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    modifier = Modifier.weight(2f)
+                                )
                                             }
                                         }
                                     }
@@ -483,7 +484,7 @@ fun OptionUI(
                                     .sortedBy { it.slipId != null }
                                     .forEachIndexed { index, input ->
                                         if (input.type == "divide") {
-                                            OutlinedTextField(
+                                            CompactOutlinedTextField(
                                                 value = if (input.breakAmount > 0) input.breakAmount.toString() else "",
                                                 onValueChange = { value ->
                                                     handleChangeDivide(index, value)

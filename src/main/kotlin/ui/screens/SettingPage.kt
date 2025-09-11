@@ -31,6 +31,7 @@ import core.services.ApiService
 import core.services.UserSession
 import core.services.PrinterService
 import core.services.PrinterInfo
+import core.config.CompactOutlinedTextField
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -471,7 +472,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                         modifier = Modifier.weight(1f)
                     ) {
                         // Footer Text
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = footerText,
                             onValueChange = { 
                                 footerText = it
@@ -480,12 +481,11 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                             label = { Text("Footer Text") },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            maxLines = 3
+                                .padding(bottom = 16.dp)
                         )
                         
                         // Font Size
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = fontSize,
                             onValueChange = { 
                                 fontSize = it
@@ -506,7 +506,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                                 .fillMaxWidth()
                                 .padding(bottom = 16.dp)
                         ) {
-                            OutlinedTextField(
+                            CompactOutlinedTextField(
                                 value = selectedPrinter,
                                 onValueChange = { },
                                 readOnly = true,
@@ -672,7 +672,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
                 
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = currentPassword,
                     onValueChange = { currentPassword = it },
                     label = { Text("Current Password") },
@@ -691,7 +691,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                         .padding(bottom = 16.dp)
                 )
                 
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = newPassword,
                     onValueChange = { newPassword = it },
                     label = { Text("New Password") },
@@ -710,7 +710,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                         .padding(bottom = 16.dp)
                 )
                 
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
                     label = { Text("Confirm Password") },
@@ -776,15 +776,14 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                             modifier = Modifier.padding(bottom = 24.dp)
                         )
                         
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = marqueeText,
                             onValueChange = { marqueeText = it },
                             label = { Text("Enter marquee text") },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(100.dp)
-                                .padding(bottom = 16.dp),
-                            maxLines = 3
+                                .padding(bottom = 16.dp)
                         )
                         
                         Button(
@@ -812,7 +811,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
                         
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = notificationTitle,
                             onValueChange = { notificationTitle = it },
                             label = { Text("Enter notification title") },
@@ -821,15 +820,14 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                                 .padding(bottom = 16.dp)
                         )
                         
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = notificationMessage,
                             onValueChange = { notificationMessage = it },
                             label = { Text("Enter notification message") },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(100.dp)
-                                .padding(bottom = 16.dp),
-                            maxLines = 3
+                                .padding(bottom = 16.dp)
                         )
                         
                         Button(
@@ -868,7 +866,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                             modifier = Modifier.padding(bottom = 24.dp)
                         )
                         
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = phoneOne,
                             onValueChange = { phoneOne = it },
                             label = { Text("Phone 1") },
@@ -877,7 +875,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                                 .padding(bottom = 16.dp)
                         )
                         
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = phoneTwo,
                             onValueChange = { phoneTwo = it },
                             label = { Text("Phone 2") },
@@ -886,7 +884,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                                 .padding(bottom = 16.dp)
                         )
                         
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = phoneThree,
                             onValueChange = { phoneThree = it },
                             label = { Text("Phone 3") },
@@ -921,15 +919,14 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                         )
                         
                         Box {
-                            OutlinedTextField(
+                            CompactOutlinedTextField(
                                 value = encryptionKey,
                                 onValueChange = { },
                                 label = { Text("Offline Key") },
                                 enabled = false,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(100.dp),
-                                maxLines = 3
+                                    .height(100.dp)
                             )
                             
                             IconButton(

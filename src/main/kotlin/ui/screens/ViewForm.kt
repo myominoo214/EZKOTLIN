@@ -35,6 +35,7 @@ import kotlin.math.round
 import core.services.ApiService
 import core.services.UserSession
 import ui.screens.LedgerApiResponseData
+import core.config.CompactOutlinedTextField
 
 // Custom serializer to handle breakAmount as either Int or decimal string
 object BreakAmountSerializer : KSerializer<Int> {
@@ -933,7 +934,7 @@ InternalTableCell(n = n, u = dividedUnit, remainingUnit = 0)
                             onExpandedChange = { showDropdown = !showDropdown },
                             modifier = Modifier.weight(1f)
                         ) {
-                            OutlinedTextField(
+                            CompactOutlinedTextField(
                                 value = subOwnersOpt.find { it.value == subOwnersVal }?.label ?: "Select Sub Owner",
                                 onValueChange = { },
                                 readOnly = true,

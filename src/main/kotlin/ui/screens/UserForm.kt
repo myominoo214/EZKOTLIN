@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import java.util.*
 import io.ktor.client.HttpClient
+import core.config.CompactOutlinedTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -335,7 +336,7 @@ fun UserForm(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Name field
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = formData.name,
                     onValueChange = { formData = formData.copy(name = it) },
                     label = { Text("Name") },
@@ -345,7 +346,7 @@ fun UserForm(
                 )
                 
                 // Password field
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = formData.password,
                     onValueChange = { formData = formData.copy(password = it) },
                     label = { Text("Password") },
@@ -361,7 +362,7 @@ fun UserForm(
                 )
                 
                 // Phone number field
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = formData.phoneNumber,
                     onValueChange = { formData = formData.copy(phoneNumber = it) },
                     label = { Text("Phone Number") },
@@ -384,7 +385,7 @@ fun UserForm(
                 
                 // Invite Key (read-only)
                 if (formData.inviteKey.isNotBlank()) {
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = formData.inviteKey,
                         onValueChange = { },
                         label = { Text("Invite Key") },
@@ -423,7 +424,7 @@ fun UserForm(
                         expanded = agentDropdownExpanded,
                         onExpandedChange = { agentDropdownExpanded = !agentDropdownExpanded }
                     ) {
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = selectedAgent?.label ?: "",
                             onValueChange = { },
                             label = { Text("Select Agent") },
@@ -464,7 +465,7 @@ fun UserForm(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = formData.discount2D,
                         onValueChange = { formData = formData.copy(discount2D = it) },
                         label = { Text("2D Discount") },
@@ -473,7 +474,7 @@ fun UserForm(
                         modifier = Modifier.weight(1f)
                     )
                     
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = formData.discount3D,
                         onValueChange = { formData = formData.copy(discount3D = it) },
                         label = { Text("3D Discount") },
@@ -487,7 +488,7 @@ fun UserForm(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = formData.prize2D,
                         onValueChange = { formData = formData.copy(prize2D = it) },
                         label = { Text("2D Prize") },
@@ -496,7 +497,7 @@ fun UserForm(
                         modifier = Modifier.weight(1f)
                     )
                     
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = formData.prize3D,
                         onValueChange = { formData = formData.copy(prize3D = it) },
                         label = { Text("3D Prize") },
@@ -510,7 +511,7 @@ fun UserForm(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = formData.tPrize,
                         onValueChange = { formData = formData.copy(tPrize = it) },
                         label = { Text("T Prize") },
@@ -519,7 +520,7 @@ fun UserForm(
                         modifier = Modifier.weight(1f)
                     )
                     
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = formData.unitPrice,
                         onValueChange = { formData = formData.copy(unitPrice = it) },
                         label = { Text("Unit Price") },
@@ -533,7 +534,7 @@ fun UserForm(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = formData.breakLimit2D,
                         onValueChange = { formData = formData.copy(breakLimit2D = it) },
                         label = { Text("2D Break Limit") },
@@ -542,7 +543,7 @@ fun UserForm(
                         modifier = Modifier.weight(1f)
                     )
                     
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = formData.breakLimit3D,
                         onValueChange = { formData = formData.copy(breakLimit3D = it) },
                         label = { Text("3D Break Limit") },
@@ -594,7 +595,7 @@ fun UserForm(
                     }
                     
                     if (formData.betType == BetType.AMOUNT) {
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = formData.hotBreak,
                             onValueChange = { formData = formData.copy(hotBreak = it) },
                             label = { Text("Hot Break Amount") },
@@ -603,7 +604,7 @@ fun UserForm(
                             modifier = Modifier.fillMaxWidth()
                         )
                     } else {
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = formData.hotPercentage,
                             onValueChange = { formData = formData.copy(hotPercentage = it) },
                             label = { Text("Hot Percentage") },
@@ -644,7 +645,7 @@ fun UserForm(
                     }
                     
                     if (formData.betType3D == BetType.AMOUNT) {
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = formData.hotBreak3D,
                             onValueChange = { formData = formData.copy(hotBreak3D = it) },
                             label = { Text("Hot Break 3D Amount") },
@@ -653,7 +654,7 @@ fun UserForm(
                             modifier = Modifier.fillMaxWidth()
                         )
                     } else {
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = formData.hotPercentage3D,
                             onValueChange = { formData = formData.copy(hotPercentage3D = it) },
                             label = { Text("Hot Percentage 3D") },

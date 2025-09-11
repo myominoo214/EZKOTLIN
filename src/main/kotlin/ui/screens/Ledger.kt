@@ -50,6 +50,7 @@ import core.stores.LedgerStore
 import core.stores.TempListStore
 import data.models.UserOption
 import ui.screens.TempListItem
+import core.config.CompactOutlinedTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -450,7 +451,7 @@ fun Ledger(
                             onExpandedChange = { userDropdownExpanded = it },
                             modifier = Modifier.weight(0.43f)
                         ) {
-                            OutlinedTextField(
+                            CompactOutlinedTextField(
                                 value = userOptions.find { it.value == state.selectedUser }?.label ?: "All",
                                 onValueChange = { },
                                 readOnly = true,

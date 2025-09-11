@@ -23,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import data.models.*
+import core.config.CompactOutlinedTextField
 
 @Serializable
 data class UsersApiResponse(
@@ -274,7 +275,7 @@ fun UserSelectionDropdown(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded }
         ) {
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = users.find { it.value == selectedUser }?.label ?: "",
                 onValueChange = {},
                 readOnly = true,

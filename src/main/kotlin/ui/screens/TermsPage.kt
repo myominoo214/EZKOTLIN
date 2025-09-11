@@ -23,7 +23,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TimePicker
@@ -78,6 +77,7 @@ import java.time.LocalTime
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.random.Random
+import core.config.CompactOutlinedTextField
 
 @Serializable
 data class TermData(
@@ -1045,7 +1045,7 @@ fun TwoDFormLayout(
     Column {
         // Break Amount, Prefix & Number of Time Slots in same row
         Row(verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = breakAmount,
                 onValueChange = onBreakAmountChange,
                 label = { Text("Break Amount") },
@@ -1055,7 +1055,7 @@ fun TwoDFormLayout(
             
             Spacer(modifier = Modifier.width(8.dp))
             
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = prefix,
                 onValueChange = onPrefixChange,
                 label = { Text("Prefix") },
@@ -1071,7 +1071,7 @@ fun TwoDFormLayout(
                 onExpandedChange = { expanded = !expanded },
                 modifier = Modifier.weight(1f)
             ) {
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = numberOfRows,
                     onValueChange = {},
                     readOnly = true,
@@ -1101,7 +1101,7 @@ fun TwoDFormLayout(
         
         // Date Range
         Row {
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = selectedStartDate,
                 onValueChange = {},
                 label = { Text("Start Date") },
@@ -1117,7 +1117,7 @@ fun TwoDFormLayout(
             
             Spacer(modifier = Modifier.width(8.dp))
             
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = selectedEndDate,
                 onValueChange = {},
                 label = { Text("End Date") },
@@ -1153,7 +1153,7 @@ fun TwoDFormLayout(
             var showEndTimePicker by remember { mutableStateOf(false) }
             
             Row {
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = startTime,
                     onValueChange = { newTime ->
                         timeSlots[index] = newTime to endTime
@@ -1175,7 +1175,7 @@ fun TwoDFormLayout(
                 
                 Spacer(modifier = Modifier.width(8.dp))
                 
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = endTime,
                     onValueChange = { newTime ->
                         timeSlots[index] = startTime to newTime
@@ -1243,7 +1243,7 @@ fun ThreeDFormLayout(
     onShowEndDatePicker: () -> Unit
 ) {
     Column {
-        OutlinedTextField(
+        CompactOutlinedTextField(
             value = termName,
             onValueChange = onTermNameChange,
             label = { Text("Term Name") },
@@ -1254,7 +1254,7 @@ fun ThreeDFormLayout(
         Spacer(modifier = Modifier.height(8.dp))
         
         Row {
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = selectedStartDate,
                 onValueChange = {},
                 label = { Text("Start Date") },
@@ -1270,7 +1270,7 @@ fun ThreeDFormLayout(
             
             Spacer(modifier = Modifier.width(8.dp))
             
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = selectedEndDate,
                 onValueChange = {},
                 label = { Text("End Date") },
@@ -1287,7 +1287,7 @@ fun ThreeDFormLayout(
         
         Spacer(modifier = Modifier.height(8.dp))
         
-        OutlinedTextField(
+        CompactOutlinedTextField(
             value = breakAmount,
             onValueChange = onBreakAmountChange,
             label = { Text("Break Amount") },
@@ -1296,7 +1296,7 @@ fun ThreeDFormLayout(
         )
         Spacer(modifier = Modifier.height(8.dp))
         
-        OutlinedTextField(
+        CompactOutlinedTextField(
             value = unitPrice,
             onValueChange = onUnitPriceChange,
             label = { Text("Unit Price") },
@@ -1306,7 +1306,7 @@ fun ThreeDFormLayout(
         
         Spacer(modifier = Modifier.height(8.dp))
         
-        OutlinedTextField(
+        CompactOutlinedTextField(
             value = winNum,
             onValueChange = onWinNumChange,
             label = { Text("Win Number") },
@@ -1511,7 +1511,7 @@ fun TermFormModal(
             ) {
                 if (term != null) {
                     // Edit mode - simplified form
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = termName,
                         onValueChange = { termName = it },
                         label = { Text("Term Name") },
@@ -1522,7 +1522,7 @@ fun TermFormModal(
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     Row {
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = startDate,
                             onValueChange = {},
                             label = { Text("Start Date") },
@@ -1538,7 +1538,7 @@ fun TermFormModal(
                         
                         Spacer(modifier = Modifier.width(8.dp))
                         
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = endDate,
                             onValueChange = {},
                             label = { Text("End Date") },
@@ -1555,7 +1555,7 @@ fun TermFormModal(
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = breakAmount,
                         onValueChange = { breakAmount = it },
                         label = { Text("Break Amount") },
@@ -1565,7 +1565,7 @@ fun TermFormModal(
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = unitPrice,
                         onValueChange = { unitPrice = it },
                         label = { Text("Unit Price") },
@@ -1575,7 +1575,7 @@ fun TermFormModal(
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = winNum,
                         onValueChange = { winNum = it },
                         label = { Text("Win Number") },

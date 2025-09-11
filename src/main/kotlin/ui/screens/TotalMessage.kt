@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +37,7 @@ import java.util.Base64
 
 import core.stores.TempListStore
 import core.stores.rememberTempListStore
+import core.config.CompactOutlinedTextField
 
 data class TotalLotteryEntry(
     val num: String,
@@ -197,18 +199,18 @@ fun FindReplaceSection(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        OutlinedTextField(
-            value = input1,
-            onValueChange = onInput1Changed,
-            label = { Text("Find") },
-            modifier = Modifier.weight(1f)
-        )
-        OutlinedTextField(
-            value = input2,
-            onValueChange = onInput2Changed,
-            label = { Text("Replace") },
-            modifier = Modifier.weight(1f)
-        )
+        CompactOutlinedTextField(
+                value = input1,
+                onValueChange = onInput1Changed,
+                label = { Text("Find") },
+             modifier = Modifier.weight(1f)
+         )
+         CompactOutlinedTextField(
+                value = input2,
+                onValueChange = onInput2Changed,
+                label = { Text("Replace") },
+             modifier = Modifier.weight(1f)
+         )
         Button(
             onClick = onReplace,
             modifier = Modifier.height(56.dp)
@@ -230,28 +232,23 @@ fun TextAreasSection(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        OutlinedTextField(
+        CompactOutlinedTextField(
             value = textarea1,
             onValueChange = onTextarea1Changed,
             label = { Text("Parse MSG") },
             modifier = Modifier
                 .weight(1f)
-                .height(200.dp),
-            maxLines = 14
+                .height(200.dp)
         )
-        OutlinedTextField(
+        CompactOutlinedTextField(
             value = textarea2,
             onValueChange = onTextarea2Changed,
             label = { Text("Error MSG") },
             modifier = Modifier
                 .weight(1f)
                 .height(200.dp),
-            maxLines = 14,
             readOnly = true,
-            isError = isError,
-            colors = OutlinedTextFieldDefaults.colors(
-                errorTextColor = MaterialTheme.colorScheme.error
-            )
+            isError = isError
         )
     }
 }

@@ -31,6 +31,7 @@ import java.io.File
 import java.util.*
 import javax.imageio.ImageIO
 import org.jetbrains.skia.Image as SkiaImage
+import core.config.CompactOutlinedTextField
 
 data class UserProfile(
     val visionCount: Int = 0,
@@ -362,14 +363,14 @@ fun TotalMessage(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = uiState.findText,
                             onValueChange = { viewModel.updateFindText(it) },
                             label = { Text("Find") },
                             modifier = Modifier.weight(1f)
                         )
                         
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = uiState.replaceText,
                             onValueChange = { viewModel.updateReplaceText(it) },
                             label = { Text("Replace") },
@@ -390,24 +391,22 @@ fun TotalMessage(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = uiState.parseMessage,
                     onValueChange = { viewModel.updateParseMessage(it) },
                     label = { Text("Parse MSG") },
                     modifier = Modifier
                         .weight(1f)
-                        .height(200.dp),
-                    maxLines = 14
+                        .height(200.dp)
                 )
                 
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = uiState.errorMessage,
                     onValueChange = { viewModel.updateErrorMessage(it) },
                     label = { Text("Error MSG") },
                     modifier = Modifier
                         .weight(1f)
                         .height(200.dp),
-                    maxLines = 14,
                     isError = uiState.isError
                 )
             }

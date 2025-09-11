@@ -25,6 +25,7 @@ import io.ktor.serialization.kotlinx.json.*
 import core.services.ApiService
 import core.services.UserSession
 import data.models.ApiResponse
+import core.config.CompactOutlinedTextField
 
 @Serializable
 data class Agent(
@@ -180,7 +181,7 @@ fun ChangeSlipUserForm(
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
                 ) {
-                    OutlinedTextField(
+                    CompactOutlinedTextField(
                         value = agents.find { it.value == selectedAgent }?.label ?: "Select an agent",
                         onValueChange = { },
                         readOnly = true,

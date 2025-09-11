@@ -23,6 +23,7 @@ import androidx.compose.ui.window.Dialog
 import java.text.SimpleDateFormat
 import java.util.*
 import data.models.*
+import core.config.CompactOutlinedTextField
 
 // Function to group terms by groupId and create group labels
 fun groupTermsByGroupId(termOptions: List<TermOption>): List<GroupedTermOption> {
@@ -261,7 +262,7 @@ fun TermSelectionDropdown(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded && !isLoading }
         ) {
-            OutlinedTextField(
+            CompactOutlinedTextField(
                 value = selectedTerm?.let { 
                     if (it.winNum != null) "${it.termName}(${it.winNum})" else it.termName 
                 } ?: "",

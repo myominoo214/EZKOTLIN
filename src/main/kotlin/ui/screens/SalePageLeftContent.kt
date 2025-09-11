@@ -37,6 +37,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
+import core.config.CompactOutlinedTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -169,7 +170,7 @@ fun SalePageLeftContent(
                     modifier = Modifier.width(80.dp)
                 )
                 
-                OutlinedTextField(
+                CompactOutlinedTextField(
                     value = state.bettedUnits,
                     onValueChange = { },
                     enabled = false,
@@ -246,7 +247,10 @@ fun SalePageLeftContent(
                         checked = state.sendSMS,
                         onCheckedChange = { viewModel.toggleSendSMS() }
                     )
-                    Text("SMS")
+                    Text(
+                        text = "SMS",
+                        style = MaterialTheme.typography.labelMedium
+                    )
                 }
                 
                 Row(
@@ -256,7 +260,10 @@ fun SalePageLeftContent(
                         checked = state.isPrintingEnabled,
                         onCheckedChange = { viewModel.togglePrinting() }
                     )
-                    Text("ပရင့်ထုတ်")
+                    Text(
+                        text = "ပရင့်ထုတ်",
+                        style = MaterialTheme.typography.labelSmall
+                    )
                 }
                 
                 if (state.userProfile?.userType == "owner" || state.userProfile?.userType == "employee") {
@@ -269,7 +276,7 @@ fun SalePageLeftContent(
                         )
                         Text(
                             text = "ကျွံခွင့်ပြု",
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
                 }
