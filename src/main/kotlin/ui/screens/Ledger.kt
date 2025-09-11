@@ -418,7 +418,7 @@ fun Ledger(
                                 ),
                                 modifier = Modifier
                                     .weight(1f)
-                                    .height(48.dp)
+                                    .height(56.dp)
                                     .border(
                                         width = 1.dp,
                                         color = Color.Gray,
@@ -458,7 +458,7 @@ fun Ledger(
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = userDropdownExpanded) },
                                 modifier = Modifier
                                     .menuAnchor()
-                                    .height(48.dp)
+                                    .height(56.dp)
                             )
                             
                             ExposedDropdownMenu(
@@ -484,10 +484,7 @@ fun Ledger(
                     // Prize Selection
                     if (state.prizes.isNotEmpty()) {
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             Column(
                                 modifier = Modifier.padding(2.dp)

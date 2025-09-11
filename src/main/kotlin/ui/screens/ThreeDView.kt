@@ -792,7 +792,7 @@ fun ThreeDView(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(2.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Input Section

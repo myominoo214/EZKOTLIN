@@ -167,7 +167,7 @@ fun SalePageLeftContent(
                 Text(
                     text = "ထိုးပီးယူနစ်",
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.width(80.dp)
+                    modifier = Modifier.width(120.dp)
                 )
                 
                 CompactOutlinedTextField(

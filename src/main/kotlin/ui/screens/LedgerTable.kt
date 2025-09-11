@@ -191,7 +191,7 @@ fun LedgerTableComponent(
                     modifier = Modifier
                         .width(columnWidths.number.dp)
                         .clickable { handleSort(SortColumn.NUMBER) }
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 16.dp, vertical = 2.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -214,8 +214,8 @@ fun LedgerTableComponent(
                     modifier = Modifier
                         .width(columnWidths.unit.dp)
                         .clickable { handleSort(SortColumn.UNIT) }
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.Center,
+                        .padding(horizontal = 16.dp, vertical = 2.dp),
+                    horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -236,10 +236,10 @@ fun LedgerTableComponent(
                 Text(
                     text = "Extra",
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
+                    textAlign = TextAlign.End,
                     modifier = Modifier
                         .width(columnWidths.extra.dp)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .padding(horizontal = 16.dp, vertical = 2.dp)
                 )
             }
             

@@ -126,7 +126,7 @@ fun BetAndRemining(
                         modifier = Modifier.weight(1f)
                     )
                     Text(
-                        text = "ထိုးပီးယူနစ်",
+                        text = "ထိုးပြီးယူနစ်",
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFF374151),
                         modifier = Modifier.weight(1f)
