@@ -655,7 +655,7 @@ fun TermsContent() {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color(0xFFF5F5F5))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .padding(12.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {

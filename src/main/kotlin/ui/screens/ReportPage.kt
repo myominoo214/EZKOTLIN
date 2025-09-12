@@ -390,20 +390,19 @@ fun SettlementsContent() {
         modifier = Modifier
             .fillMaxSize()
             .fillMaxHeight()
-            .padding(8.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Controls Card
+        // Merged Controls and Data Table Card
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Single Row with all controls
+                // Controls Section
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -490,15 +489,9 @@ fun SettlementsContent() {
                         )
                     }
                 }
-            }
-        }
-        
-        // Data Table Card
-        Card(
-            modifier = Modifier.fillMaxWidth().weight(1f),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+                
+                
+                // Data Table Section
                 if (loading) {
                     Box(
                         modifier = Modifier
@@ -669,7 +662,6 @@ fun SimplifiedView(
         
         // Total Row
         subTotal?.let { total ->
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             Row(
                  modifier = Modifier
                      .fillMaxWidth()
@@ -823,7 +815,6 @@ fun StatementTable(
             }
         }
         
-        HorizontalDivider()
         
         // Data Rows - Scrollable
         LazyColumn(

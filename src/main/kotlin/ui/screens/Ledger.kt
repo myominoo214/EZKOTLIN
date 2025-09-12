@@ -372,7 +372,7 @@ fun Ledger(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             // Header Section
             Card(

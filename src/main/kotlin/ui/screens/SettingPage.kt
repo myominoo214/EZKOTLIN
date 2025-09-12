@@ -334,7 +334,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
@@ -351,7 +351,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                 modifier = Modifier
                     .weight(1f),
                 shape = RoundedCornerShape(8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
             Column(
                 modifier = Modifier.padding(24.dp)
@@ -659,7 +659,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                 modifier = Modifier
                     .weight(1f),
                 shape = RoundedCornerShape(8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
             Column(
                 modifier = Modifier.padding(24.dp)
@@ -763,7 +763,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                         .weight(1f)
                         .padding(bottom = 16.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(
                         modifier = Modifier.padding(24.dp)
@@ -853,7 +853,7 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                         .weight(1f)
                         .padding(bottom = 16.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(
                         modifier = Modifier.padding(24.dp)

@@ -350,242 +350,202 @@ fun WinNumContent() {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
-        // Header Card
+        // Merged Header and Winners Card
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
+            modifier = Modifier.fillMaxWidth().fillMaxSize(),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
             )
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-
-                
-                // Main Control Row - Term dropdown, User dropdown, Labels, and Share button
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+            Column {
+                // Header Section
+                Column(
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    // Term Selection
-                    Column(modifier = Modifier.weight(1f)) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .clickable { showTermDialog = true },
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface
-                            )
-                        ) {
-                            Box(
+                    // Main Control Row - Term dropdown, User dropdown, Labels, and Share button
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Term Selection
+                        Column(modifier = Modifier.weight(1f)) {
+                            Card(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = 12.dp),
-                                contentAlignment = Alignment.CenterStart
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .clickable { showTermDialog = true },
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                )
                             ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 12.dp),
+                                    contentAlignment = Alignment.CenterStart
                                 ) {
-                                    Text(
-                                        text = if (selectedTerm == null) "အပါတ်စဉ်များရွေးချယ်ပါ"
-                                               else selectedTerm?.termName ?: "Term selected",
-                                        fontSize = 14.sp,
-                                        color = if (selectedTerm == null) MaterialTheme.colorScheme.onSurfaceVariant
-                                               else MaterialTheme.colorScheme.onSurface
-                                    )
-                                    if (loading) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(16.dp),
-                                            strokeWidth = 2.dp
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = if (selectedTerm == null) "အပါတ်စဉ်များရွေးချယ်ပါ"
+                                                   else selectedTerm?.termName ?: "Term selected",
+                                            fontSize = 14.sp,
+                                            color = if (selectedTerm == null) MaterialTheme.colorScheme.onSurfaceVariant
+                                                   else MaterialTheme.colorScheme.onSurface
                                         )
-                                    } else {
-                                        Icon(
-                                            imageVector = Icons.Default.ArrowDropDown,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        if (loading) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(16.dp),
+                                                strokeWidth = 2.dp
+                                            )
+                                        } else {
+                                            Icon(
+                                                imageVector = Icons.Default.ArrowDropDown,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // User Selection
+                        Box(modifier = Modifier.weight(1f)) {
+                            UserSelectionDropdown(
+                                users = userOptions,
+                                selectedUser = selectedUser?.value ?: "",
+                                onUserSelected = { userId -> 
+                                    selectedUser = userOptions.find { it.value == userId }
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        
+                        // Prize Filter
+                        if (prizes.isNotEmpty()) {
+                            Row(
+                                modifier = Modifier.weight(1.5f),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                
+                                // All option
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    RadioButton(
+                                        selected = selectedPrize == null,
+                                        onClick = { selectedPrize = null },
+                                        modifier = Modifier.size(12.dp)
+                                    )
+                                    Text("All", fontSize = 12.sp, modifier = Modifier.padding(start = 8.dp))
+                                    
+                                }
+                                
+                                // Prize options
+                                prizes.take(2).forEach { prize ->
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        RadioButton(
+                                            selected = selectedPrize == prize,
+                                            onClick = { selectedPrize = prize },
+                                            modifier = Modifier.size(16.dp).padding(start = 4.dp)
+                                        )
+                                        Text(
+                                            text = formatter.format(prize),
+                                            fontSize = 12.sp,
+                                            modifier = Modifier.padding(start = 8.dp)
                                         )
                                     }
                                 }
                             }
                         }
-                    }
-                    
-                    // User Selection
-                    Box(modifier = Modifier.weight(1f)) {
-                        UserSelectionDropdown(
-                            users = userOptions,
-                            selectedUser = selectedUser?.value ?: "",
-                            onUserSelected = { userId -> 
-                                selectedUser = userOptions.find { it.value == userId }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    
-                    // Prize Filter
-                    if (prizes.isNotEmpty()) {
-                        Row(
-                            modifier = Modifier.weight(1.5f),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            
-                            // All option
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(
-                                    selected = selectedPrize == null,
-                                    onClick = { selectedPrize = null },
-                                    modifier = Modifier.size(12.dp)
+                        
+                        // Win Number Display
+                        winNum?.let { num ->
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "ပေါက်သီး",
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontSize = 12.sp
                                 )
-                                Text("All", fontSize = 12.sp, modifier = Modifier.padding(start = 8.dp))
-                                
+                                Text(
+                                    text = num,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp
+                                )
                             }
-                            
-                            // Prize options
-                            prizes.take(2).forEach { prize ->
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    RadioButton(
-                                        selected = selectedPrize == prize,
-                                        onClick = { selectedPrize = prize },
-                                        modifier = Modifier.size(16.dp).padding(start = 4.dp)
-                                    )
-                                    Text(
-                                        text = formatter.format(prize),
-                                        fontSize = 12.sp,
-                                        modifier = Modifier.padding(start = 8.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    
-                    // Win Number Display
-                    winNum?.let { num ->
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "ပေါက်သီး",
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 12.sp
-                            )
-                            Text(
-                                text = num,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
-                    
-                    // Totals Display
-                    subTotal?.let { totals ->
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "ဒဲ့",
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.error,
-                                fontSize = 12.sp
-                            )
-                            Text(
-                                text = formatter.format(totals.TotalAmountWithPrize),
-                                fontSize = 14.sp
-                            )
                         }
                         
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.weight(1f)
+                        // Totals Display
+                        subTotal?.let { totals ->
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "ဒဲ့",
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 12.sp
+                                )
+                                Text(
+                                    text = formatter.format(totals.TotalAmountWithPrize),
+                                    fontSize = 14.sp
+                                )
+                            }
+                            
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "တွတ်",
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 12.sp
+                                )
+                                Text(
+                                    text = formatter.format(totals.TotalTAmountWithPrize),
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                        
+                        // Share Button
+                        IconButton(
+                            onClick = {
+                                // TODO: Implement print functionality
+                                println("Print functionality not implemented yet")
+                            },
+                            modifier = Modifier
+                                .background(
+                                    MaterialTheme.colorScheme.primary,
+                                    RoundedCornerShape(8.dp)
+                                )
                         ) {
-                            Text(
-                                text = "တွတ်",
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.error,
-                                fontSize = 12.sp
-                            )
-                            Text(
-                                text = formatter.format(totals.TotalTAmountWithPrize),
-                                fontSize = 14.sp
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = "Share",
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
-                    
-                    // Share Button
-                    IconButton(
-                        onClick = {
-                            // TODO: Implement print functionality
-                            println("Print functionality not implemented yet")
-                        },
-                        modifier = Modifier
-                            .background(
-                                MaterialTheme.colorScheme.primary,
-                                RoundedCornerShape(8.dp)
-                            )
-                    ) {
-                        Icon(
-                            Icons.Default.Share,
-                            contentDescription = "Share",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
                 }
-            }
-        }
-        
-        // Loading Indicator
-        if (loading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-        
-        // Error Message
-        errorMessage?.let { error ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                )
-            ) {
-                Text(
-                    text = error,
-                    modifier = Modifier.padding(16.dp),
-                    color = MaterialTheme.colorScheme.onErrorContainer
-                )
-            }
-        }
-        
-        // Winners Table
-        if (winners.isNotEmpty()) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            ) {
-                Column {
+                
+                // Winners Table Section
+                if (winners.isNotEmpty()) {
+                    
                     // Table Header
                     Row(
                         modifier = Modifier
@@ -711,10 +671,43 @@ fun WinNumContent() {
                                     )
                                 }
                             }
+                        }
                     }
                 }
             }
         }
+        
+        // Loading Indicator
+        if (loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        
+        // Error Message
+        errorMessage?.let { error ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer
+                )
+            ) {
+                Text(
+                    text = error,
+                    modifier = Modifier.padding(16.dp),
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
+        }
+        
+
     }
     
     // Term Selection Dialog
@@ -740,5 +733,4 @@ fun WinNumContent() {
             onDismiss = { showTermDialog = false }
         )
     }
-}
 }
