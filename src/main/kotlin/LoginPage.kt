@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import kotlinx.serialization.Serializable
 import kotlinx.coroutines.delay
 import java.net.InetAddress
@@ -128,40 +129,45 @@ fun LoginPage(
                                     deviceName = getDeviceInfo()
                                 )
                                 
-                                // Call getUserProfile API after successful login
+                                // Call getUserProfile and getSettingByUserId APIs in parallel for better performance
                                 try {
-                                    val profileResponse = apiService.get<UserProfileApiResponse>(
-                                        url = "${ApiService.BASE_URL}/v1/account/getUserProfile",
-                                        headers = userSession.getAuthHeaders()
-                                    )
+                                    val profileDeferred = async {
+                                        apiService.get<UserProfileApiResponse>(
+                                            url = "${ApiService.BASE_URL}/v1/account/getUserProfile",
+                                            headers = userSession.getAuthHeaders()
+                                        )
+                                    }
                                     
+                                    val settingsDeferred = async {
+                                        apiService.get<SettingsApiResponse>(
+                                            url = "${ApiService.BASE_URL}/v1/account/getSettingByUserId",
+                                            headers = userSession.getAuthHeaders()
+                                        )
+                                    }
+                                    
+                                    // Wait for both API calls to complete
+                                    val profileResponse = profileDeferred.await()
+                                    val settingsResponse = settingsDeferred.await()
+                                    
+                                    // Process profile response
                                     if (profileResponse.data?.code == 200 && profileResponse.data?.data != null) {
                                         userSession.setUserProfile(profileResponse.data.data)
                                         //println("[DEBUG] User profile loaded successfully: ${profileResponse.data.data}")
                                     } else {
                                         //println("[DEBUG] Failed to load user profile: ${profileResponse.data?.message}")
                                     }
-                                } catch (e: Exception) {
-                                    println("[DEBUG] Error loading user profile: ${e.message}")
-                                    // Don't fail login if profile loading fails
-                                }
-                                
-                                // Call getSettingByUserId API after successful login
-                                try {
-                                    val settingsResponse = apiService.get<SettingsApiResponse>(
-                                        url = "${ApiService.BASE_URL}/v1/account/getSettingByUserId",
-                                        headers = userSession.getAuthHeaders()
-                                    )
                                     
+                                    // Process settings response
                                     if (settingsResponse.data?.code == "200" && settingsResponse.data?.data != null) {
                                         userSession.setSettings(settingsResponse.data.data)
                                         println("[DEBUG] User settings loaded successfully")
                                     } else {
                                         println("[DEBUG] Failed to load user settings - Code: ${settingsResponse.data?.code}, Message: ${settingsResponse.data?.message}")
                                     }
+                                    
                                 } catch (e: Exception) {
-                                    println("[DEBUG] Error loading user settings: ${e.message}")
-                                    // Don't fail login if settings loading fails
+                                    println("[DEBUG] Error loading user data: ${e.message}")
+                                    // Don't fail login if profile/settings loading fails
                                 }
                             }
                             onLoginSuccess()
