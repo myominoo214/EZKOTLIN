@@ -35,6 +35,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import core.utils.AudioPlayer
 import kotlinx.coroutines.SupervisorJob
 import kotlin.math.roundToInt
@@ -45,6 +47,7 @@ import core.stores.rememberTempListStore
 import data.models.UserOption
 
 // Data Models
+@Stable
 data class ThreeDEntry(
     val number: String,
     val amount: Int,
@@ -54,6 +57,7 @@ data class ThreeDEntry(
     val delete: Boolean = false
 )
 
+@Stable
 data class ThreeDViewState(
     val autoIncrement3D: Boolean = false,
     val number3D: String = "",
@@ -73,6 +77,7 @@ data class ThreeDViewState(
 )
 
 // Pattern Processing Functions
+@Immutable
 object ThreeDPatternProcessor {
     
     fun processBreakRule(digit: String, groupId: Int, amount: Int): List<ThreeDEntry> {
@@ -346,6 +351,17 @@ class ThreeDViewModel {
     val unitFocusRequester = FocusRequester()
     val payFocusRequester = FocusRequester()
     
+    // Debouncing for input validation
+    private var validationJob: Job? = null
+    private val validationCache = mutableMapOf<String, Boolean>()
+    
+    // Cached compiled regex patterns for better performance
+    private val cachedPatterns = mapOf(
+        "numberPattern" to Regex("\\d+"),
+        "validInputPattern" to Regex("^[0-9+]+$"),
+        "threeDPattern" to Regex("^\\d{3}$")
+    )
+    
     fun updateNumber3D(value: String) {
         _state.value = _state.value.copy(
             number3D = value,
@@ -358,6 +374,32 @@ class ThreeDViewModel {
             unitPrice3D = value,
             unitPriceError = null
         )
+        
+        // Debounced validation to prevent excessive processing
+        validationJob?.cancel()
+        validationJob = scope.launch {
+            delay(300) // Wait 300ms before validating
+            validateUnitInputDebounced(value.text)
+        }
+    }
+    
+    private suspend fun validateUnitInputDebounced(unitText: String) {
+        // Check cache first
+        val cacheKey = "unit_$unitText"
+        if (validationCache.containsKey(cacheKey)) {
+            return
+        }
+        
+        // Perform validation and cache result
+        val isValid = unitText.isNotEmpty() && unitText.split("+").all { 
+            it.toIntOrNull() != null && it.toInt() > 0 
+        }
+        validationCache[cacheKey] = isValid
+        
+        // Limit cache size to prevent memory issues
+        if (validationCache.size > 100) {
+            validationCache.clear()
+        }
     }
     
     fun selectAllUnitText() {
@@ -768,24 +810,29 @@ fun ThreeDView(
     val tempListStore = rememberTempListStore()
     val tempListState by tempListStore.state.collectAsState()
     
-    // Update discount when user changes
-    LaunchedEffect(user, apiUserData) {
+    // Cached derived states for performance
+    val hasUserSelected by remember { derivedStateOf { user != null } }
+    val totalCalculation by remember { derivedStateOf { state.totalAmount + state.discount } }
+    val isValidInput by remember { derivedStateOf { state.number3DError == null && state.unitPriceError == null } }
+    val discountedAmount by remember { derivedStateOf { state.totalAmount - state.discount } }
+    
+    // Update discount when user changes - optimized with key
+    LaunchedEffect(key1 = user?.userId, key2 = apiUserData.size) {
         viewModel.updateDiscount(user, apiUserData)
     }
     
-    // Focus number input when numberInput is "3D"
-    LaunchedEffect(numberInput) {
+    // Focus number input when numberInput is "3D" - optimized with key
+    LaunchedEffect(key1 = numberInput) {
         if (numberInput == "3D") {
             viewModel.focusNumberInput()
         }
     }
     
-    // Focus number input when user is selected
-    LaunchedEffect(user) {
+    // Focus number input when user is selected - optimized with key
+    LaunchedEffect(key1 = user?.userId) {
         if (user != null) {
             onUserSelectionChanged?.invoke()
             viewModel.focusNumberInput()
-            println("[DEBUG] ThreeDView: User selected, focusing number input")
         }
     }
     
@@ -816,8 +863,8 @@ fun ThreeDView(
                     onValueChange = viewModel::updateNumber3D,
                     singleLine = true,
                     modifier = Modifier
-                        .weight(1f)
                         .focusRequester(viewModel.numberFocusRequester)
+                        .weight(1f)
                         .onKeyEvent { keyEvent ->
                             when {
                                 keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyDown -> {

@@ -146,7 +146,7 @@ fun Sidebar(
     
     Column(
         modifier = Modifier
-            .width(180.dp)
+            .width(160.dp)
             .fillMaxHeight()
             .background(backgroundColor)
             .padding(8.dp)

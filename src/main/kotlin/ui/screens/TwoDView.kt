@@ -47,6 +47,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 // Kotlin standard library
 import kotlin.math.floor
@@ -54,6 +56,7 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 
 // Data Models
+@Stable
 data class BetEntry(
     val number: String,
     val amount: Int,
@@ -65,6 +68,7 @@ data class BetEntry(
 
 // User and ApiUserData are defined in SalePage.kt
 
+@Stable
 data class TwoDViewState(
     val selected2DType: String = "",
     val autoIncrement2D: Boolean = false,
@@ -83,6 +87,7 @@ data class TwoDViewState(
 )
 
 // Pattern Definitions
+@Immutable
 object TwoDPatterns {
     val patterns = mapOf(
         "sp" to listOf("00", "22", "44", "66", "88"),
@@ -130,6 +135,18 @@ class TwoDViewModel {
     val unitFocusRequester = FocusRequester()
     val payFocusRequester = FocusRequester()
     
+    // Debouncing for input validation
+    private var validationJob: Job? = null
+    private val validationCache = mutableMapOf<String, Boolean>()
+    
+    // Cached compiled regex patterns for better performance
+    private val cachedPatterns = mapOf(
+        "groupRPattern" to Regex("^(\\d{2}\\.)+\\d{2}(\\.)?[rR/]$"),
+        "dotPattern" to Regex("^(\\d+)(\\.)$"),
+        "doubleDotPattern" to Regex("^(\\d+)(\\.\\.)$"),
+        "groupDotPattern" to Regex("^(\\d{2}\\.)+\\d{2}\\.$")
+    )
+    
     fun updateNumber2D(value: String) {
         // Ensure no input filtering - accept all characters including dots and slashes
         _state.value = _state.value.copy(
@@ -143,6 +160,32 @@ class TwoDViewModel {
             unit2D = value,
             unitPriceError = null
         )
+        
+        // Debounced validation to prevent excessive processing
+        validationJob?.cancel()
+        validationJob = scope.launch {
+            delay(300) // Wait 300ms before validating
+            validateUnitInputDebounced(value.text)
+        }
+    }
+    
+    private suspend fun validateUnitInputDebounced(unitText: String) {
+        // Check cache first
+        val cacheKey = "unit_$unitText"
+        if (validationCache.containsKey(cacheKey)) {
+            return
+        }
+        
+        // Perform validation and cache result
+        val isValid = unitText.isNotEmpty() && unitText.split("+").all { 
+            it.toIntOrNull() != null && it.toInt() > 0 
+        }
+        validationCache[cacheKey] = isValid
+        
+        // Limit cache size to prevent memory issues
+        if (validationCache.size > 100) {
+            validationCache.clear()
+        }
     }
     
     fun selectAllUnitText() {
@@ -335,7 +378,7 @@ class TwoDViewModel {
         val amount = unit2D.split("+").sumOf { it.toIntOrNull() ?: 0 }
         
         // Handle group pattern ending with /, r, or R (optionally with a dot before)
-        val groupRPattern = Regex("^(\\d{2}\\.)+\\d{2}(\\.)?[rR/]$")
+        val groupRPattern = cachedPatterns["groupRPattern"]!!
         val rules = when {
             groupRPattern.matches(number) -> {
                 // Remove the trailing r/R/ and optional dot, then split
@@ -798,24 +841,44 @@ fun TwoDView(
     onOpenBetAndReminingModal: (String) -> Unit = {},
     viewModel: TwoDViewModel = remember { TwoDViewModel() }
 ) {
-    println("[DEBUG] TwoDView: Composable recomposed - termId: $termId, user: ${user?.name}, isModalOpen: ${viewModel.state.collectAsState().value.isModalOpen}")
+    // Cache expensive state calculations
     val state by viewModel.state.collectAsState()
     val focusManager = LocalFocusManager.current
     val tempListStore = rememberTempListStore()
     val tempListState by tempListStore.state.collectAsState()
     val ledgerStore = remember { LedgerStore.getInstance() }
     
-    // Update discount when user changes
-    LaunchedEffect(user, apiUserData) {
+    // Derived state to avoid unnecessary recompositions
+    val isUserSelected by remember { derivedStateOf { user != null } }
+    val totalCalculation by remember { derivedStateOf { 
+        state.totalAmount + state.remainAmount 
+    }}
+    val hasValidInput by remember { derivedStateOf {
+        state.number2D.isNotEmpty() && state.unit2D.text.isNotEmpty()
+    }}
+    val discountedAmount by remember { derivedStateOf {
+        if (state.discount > 0) {
+            (state.totalAmount * (100 - state.discount) / 100)
+        } else state.totalAmount
+    }}
+    
+    // Update discount when user changes - optimized with key
+    LaunchedEffect(key1 = user?.userId, key2 = apiUserData.size) {
         viewModel.updateDiscount(user, apiUserData, true) // TwoDView always uses discount2D
     }
     
-    // Focus number input when user is selected
-    LaunchedEffect(user) {
+    // Focus number input when user is selected - optimized with key
+    LaunchedEffect(key1 = user?.userId) {
         if (user != null) {
             onUserSelectionChanged?.invoke()
             viewModel.focusNumberInput()
-            println("[DEBUG] TwoDView: User selected, focusing number input")
+        }
+    }
+    
+    // Focus number input when numberInput is "2D" - optimized with key
+    LaunchedEffect(key1 = numberInput) {
+        if (numberInput == "2D") {
+            viewModel.focusNumberInput()
         }
     }
     
@@ -845,8 +908,8 @@ fun TwoDView(
                     value = state.number2D,
                     onValueChange = viewModel::updateNumber2D,
                     modifier = Modifier
-                    .weight(1f)
-                    .focusRequester(viewModel.numberFocusRequester)
+                        .weight(1f)
+                        .focusRequester(viewModel.numberFocusRequester)
                         .onKeyEvent { keyEvent ->
                         when {
                             keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyDown -> {
