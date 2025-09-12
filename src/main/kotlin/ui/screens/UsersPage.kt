@@ -23,8 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material.Button as Material2Button
-import androidx.compose.material.ButtonDefaults as Material2ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -149,22 +147,25 @@ fun UsersContent() {
                 )
             }
             
-            Material2Button(
+            Button(
                 onClick = {
                     selectedUser = null
                     showUserForm = true
                 },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
             ) {
                 Icon(
-                    imageVector = Icons.Default.PersonAdd,
+                    Icons.Default.PersonAdd,
                     contentDescription = "Add User",
-                    modifier = Modifier.size(18.dp),
-                    tint = Color.White
+                    modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "အသစ်လုပ်မည်",
-                    color = Color.White
+                    "အသစ်လုပ်မည်",
+                    style = MaterialTheme.typography.labelMedium
                 )
             }
         }
