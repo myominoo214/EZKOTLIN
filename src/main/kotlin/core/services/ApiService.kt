@@ -1206,7 +1206,7 @@ class ApiService {
     
     suspend fun addSlips(payload: ui.screens.SlipPayload): ui.screens.ApiResponse<ui.screens.SlipResponse> = withContext(Dispatchers.IO) {
         try {
-            val response = client.post("$BASE_URL/v1/ledger/addSlips") {
+            val response = client.post("$BASE_URL/v1/slip/addSlips") {
                 contentType(ContentType.Application.Json)
                 setBody(payload)
                 UserSession.getInstance().getAuthHeaders().forEach { (key, value) ->
@@ -1226,7 +1226,7 @@ class ApiService {
     
     suspend fun addSlipsWithHotBreak(payload: ui.screens.SlipPayload): ui.screens.ApiResponse<ui.screens.SlipResponse> = withContext(Dispatchers.IO) {
         try {
-            val response = client.post("$BASE_URL/v1/ledger/addSlipsWithHotBreak") {
+            val response = client.post("$BASE_URL/v1/slip/addSlipsWithHotBreak") {
                 contentType(ContentType.Application.Json)
                 setBody(payload)
                 UserSession.getInstance().getAuthHeaders().forEach { (key, value) ->

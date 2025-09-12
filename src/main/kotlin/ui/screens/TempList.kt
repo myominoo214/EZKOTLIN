@@ -194,7 +194,7 @@ fun TempListHeader(modifier: Modifier = Modifier) {
                 .weight(1f)
                 .padding(8.dp),
             textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
         
@@ -204,7 +204,7 @@ fun TempListHeader(modifier: Modifier = Modifier) {
                 .weight(1.7f)
                 .padding(8.dp),
             textAlign = TextAlign.End,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
         
@@ -214,12 +214,12 @@ fun TempListHeader(modifier: Modifier = Modifier) {
                 .weight(1.3f)
                 .padding(8.dp),
             textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
         
         Text(
-            text = "Actions",
+            text = "",
             modifier = Modifier
                 .weight(1f)
                 .padding(8.dp),
