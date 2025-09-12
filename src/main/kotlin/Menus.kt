@@ -3,10 +3,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material3.MaterialTheme as Material3Theme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.Icon as Material3Icon
+import androidx.compose.material3.IconButton as Material3IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -18,8 +27,33 @@ import FontConfig
 
 data class MenuItem(
     val title: String,
+    val icon: ImageVector,
     val onClick: () -> Unit
 )
+
+// Theme state management
+@Composable
+fun rememberThemeState(): MutableState<Boolean> {
+    return remember { mutableStateOf(false) } // false = light, true = dark
+}
+
+@Composable
+fun ThemeChanger(
+    isDarkTheme: Boolean,
+    onThemeChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Material3IconButton(
+        onClick = { onThemeChange(!isDarkTheme) },
+        modifier = modifier
+    ) {
+        Material3Icon(
+            imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
+            contentDescription = if (isDarkTheme) "Switch to Light Theme" else "Switch to Dark Theme",
+            tint = if (isDarkTheme) Color.Yellow else Color.Gray
+        )
+    }
+}
 
 fun getLocalIPAddress(): String {
     try {
@@ -48,6 +82,7 @@ fun SalesPage(
     onLogout: () -> Unit
 ) {
     var selectedItem by remember { mutableStateOf("အရောင်း") }
+    val isDarkTheme = rememberThemeState()
 
     Row(modifier = Modifier.fillMaxSize()) {
         // Sidebar
@@ -55,7 +90,9 @@ fun SalesPage(
             selectedItem = selectedItem,
             onItemSelected = { item: String -> selectedItem = item },
             userSession = userSession,
-            onLogout = onLogout
+            onLogout = onLogout,
+            isDarkTheme = isDarkTheme.value,
+            onThemeChange = { isDarkTheme.value = it }
         )
         
         // Main Content
@@ -86,52 +123,72 @@ fun Sidebar(
     selectedItem: String,
     onItemSelected: (String) -> Unit,
     userSession: UserSession,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    isDarkTheme: Boolean,
+    onThemeChange: (Boolean) -> Unit
 ) {
     val menuItems = listOf(
-        MenuItem("အရောင်း") { onItemSelected("အရောင်း") },
-        MenuItem("အပတ်စဉ်") { onItemSelected("အပတ်စဉ်") },
-        MenuItem("ထိုးသား") { onItemSelected("ထိုးသား") },
-        MenuItem("စလစ်") { onItemSelected("စလစ်") },
-        MenuItem("လယ်ဂျာ") { onItemSelected("လယ်ဂျာ") },
-        MenuItem("စာရင်း") { onItemSelected("စာရင်း") },
-        MenuItem("အလျော်စာရင်း") { onItemSelected("အလျော်စာရင်း") },
-        MenuItem("ပြင်ဖျက်မှတ်တမ်း") { onItemSelected("ပြင်ဖျက်မှတ်တမ်း") },
-        MenuItem("ဖိုင်ရှင်း") { onItemSelected("ဖိုင်ရှင်း") },
-        MenuItem("Setting") { onItemSelected("Setting") }
+        MenuItem("အရောင်း", Icons.Default.ShoppingCart) { onItemSelected("အရောင်း") },
+        MenuItem("အပတ်စဉ်", Icons.Default.Schedule) { onItemSelected("အပတ်စဉ်") },
+        MenuItem("ထိုးသား", Icons.Default.People) { onItemSelected("ထိုးသား") },
+        MenuItem("စလစ်", Icons.Default.Receipt) { onItemSelected("စလစ်") },
+        MenuItem("လယ်ဂျာ", Icons.Default.AccountBalance) { onItemSelected("လယ်ဂျာ") },
+        MenuItem("စာရင်း", Icons.Default.Assessment) { onItemSelected("စာရင်း") },
+        MenuItem("အလျော်စာရင်း", Icons.Default.EmojiEvents) { onItemSelected("အလျော်စာရင်း") },
+        MenuItem("ပြင်ဖျက်မှတ်တမ်း", Icons.Default.History) { onItemSelected("ပြင်ဖျက်မှတ်တမ်း") },
+        MenuItem("ဖိုင်ရှင်း", Icons.Default.CleaningServices) { onItemSelected("ဖိုင်ရှင်း") },
+        MenuItem("Setting", Icons.Default.Settings) { onItemSelected("Setting") }
     )
 
+    val backgroundColor = if (isDarkTheme) Color(0xFF1E1E1E) else Color(0xFFF5F5F5)
+    val textColor = if (isDarkTheme) Color.White else Color.Black
+    val selectedColor = if (isDarkTheme) Color(0xFF4CAF50) else Color(0xFF2196F3)
+    
     Column(
         modifier = Modifier
-            .width(150.dp)
+            .width(180.dp)
             .fillMaxHeight()
-            .background(MaterialTheme.colors.surface)
+            .background(backgroundColor)
             .padding(8.dp)
     ) {
-        // Header - User Info
+        // IP Address and Theme Changer in same row
         val ipAddress = remember { getLocalIPAddress() }
-        Column(
-            modifier = Modifier.padding(bottom = 1.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = ipAddress,
-                fontSize = 10.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colors.onSurface,
+                color = textColor,
                 fontFamily = FontConfig.getFontFamily(ipAddress)
             )
             
-            userSession.sessionData?.let { session ->
+            ThemeChanger(
+                isDarkTheme = isDarkTheme,
+                onThemeChange = onThemeChange
+            )
+        }
+        
+        // User Info
+        userSession.sessionData?.let { session ->
+            Column(
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
                 Text(
                     text = "User: ${session.accountKey}",
-                    fontSize = 10.sp,
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                    fontSize = 12.sp,
+                    color = textColor.copy(alpha = 0.7f),
                     fontFamily = FontConfig.getFontFamily(session.accountKey)
                 )
                 Text(
                     text = "Device: ${session.deviceName}",
-                    fontSize = 8.sp,
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                    fontSize = 12.sp,
+                    color = textColor.copy(alpha = 0.5f),
                     fontFamily = FontConfig.getFontFamily(session.deviceName)
                 )
             }
@@ -141,21 +198,34 @@ fun Sidebar(
         menuItems.forEach { item ->
             val isSelected = selectedItem == item.title
             
-            Text(
-                text = item.title,
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { item.onClick() }
                     .background(
-                        color = if (isSelected) Color(0xFF2196F3).copy(alpha = 0.1f) else Color.Transparent,
-                        shape = RoundedCornerShape(4.dp)
+                        color = if (isSelected) selectedColor.copy(alpha = 0.1f) else Color.Transparent,
+                        shape = RoundedCornerShape(8.dp)
                     )
-                    .padding(8.dp),
-                color = if (isSelected) Color(0xFF2196F3) else MaterialTheme.colors.onSurface,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                fontSize = 14.sp,
-                fontFamily = FontConfig.getFontFamily(item.title)
-            )
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = item.icon,
+                    contentDescription = item.title,
+                    tint = if (isSelected) selectedColor else textColor.copy(alpha = 0.7f),
+                    modifier = Modifier.size(20.dp)
+                )
+                
+                Spacer(modifier = Modifier.width(6.dp))
+                
+                Text(
+                    text = item.title,
+                    color = if (isSelected) selectedColor else textColor,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                    fontSize = 13.sp,
+                    fontFamily = FontConfig.getFontFamily(item.title)
+                )
+            }
             
             Spacer(modifier = Modifier.height(4.dp))
         }
@@ -169,10 +239,16 @@ fun Sidebar(
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(0xFFE53E3E),
+                backgroundColor = if (isDarkTheme) Color(0xFFD32F2F) else Color(0xFFE53E3E),
                 contentColor = Color.White
             )
         ) {
+            Icon(
+                 imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                 contentDescription = "Logout",
+                 modifier = Modifier.size(16.dp)
+             )
+            Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = "Logout",
                 fontSize = 12.sp,
