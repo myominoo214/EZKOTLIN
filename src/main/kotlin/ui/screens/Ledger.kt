@@ -726,9 +726,7 @@ fun Ledger(
                     .fillMaxHeight(1f),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+                Column{
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
@@ -747,8 +745,7 @@ fun Ledger(
                     // Summary/Detail Toggle
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
+                            .fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Row(
@@ -787,7 +784,7 @@ fun Ledger(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(MaterialTheme.colorScheme.primaryContainer)
+                                        .background(Color(0xFFDBEAFE))
                                         .padding(12.dp)
                                 ) {
                                     Text(
@@ -796,9 +793,10 @@ fun Ledger(
                                         fontWeight = FontWeight.Bold
                                     )
                                     Text(
-                                        text = "Number",
+                                        text = "နံပါတ်",
                                         modifier = Modifier.weight(1f),
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center
                                     )
                                     Text(
                                         text = "Unit",
@@ -807,15 +805,16 @@ fun Ledger(
                                         textAlign = TextAlign.End
                                     )
                                     Text(
-                                        text = "Slip No",
+                                        text = "စလစ်",
                                         modifier = Modifier.weight(1f),
                                         fontWeight = FontWeight.Bold,
                                         textAlign = TextAlign.Center
                                     )
                                     Text(
                                         text = "Date",
-                                        modifier = Modifier.weight(1f),
-                                        fontWeight = FontWeight.Bold
+                                        modifier = Modifier.weight(2f),
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center
                                     )
                                 }
                             }
@@ -838,7 +837,8 @@ fun Ledger(
                                     )
                                     Text(
                                         text = item.number,
-                                        modifier = Modifier.weight(1f)
+                                        modifier = Modifier.weight(1f),
+                                        textAlign = TextAlign.Center
                                     )
                                     Text(
                                         text = item.amount.toInt().toString(),
@@ -856,7 +856,8 @@ fun Ledger(
                                         text = item.createdAt.format(
                                             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
                                         ),
-                                        modifier = Modifier.weight(1f)
+                                        modifier = Modifier.weight(2f),
+                                        textAlign = TextAlign.Center
                                     )
                                 }
                             }

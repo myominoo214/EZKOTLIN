@@ -718,6 +718,11 @@ class ApiService {
         val fontSize: Int
     )
 
+    @Serializable
+    data class LogoutRequest(
+        val deviceName: String
+    )
+
     suspend fun updateSettings(request: UpdateSettingsRequest): ApiResponse<String> {
         val url = "$BASE_URL/v1/account/updateSettings"
         return postForString(
@@ -775,6 +780,15 @@ class ApiService {
     suspend fun updateFontSize(request: UpdateFontSizeRequest): ApiResponse<String> {
         val url = "$BASE_URL/v1/account/updateFontSize"
         return putForString(
+            url = url,
+            body = request,
+            headers = mapOf("Authorization" to "Bearer ${UserSession.getInstance().authToken}")
+        )
+    }
+
+    suspend fun logout(request: LogoutRequest): ApiResponse<String> {
+        val url = "$BASE_URL/v1/account/logout"
+        return postForString(
             url = url,
             body = request,
             headers = mapOf("Authorization" to "Bearer ${UserSession.getInstance().authToken}")

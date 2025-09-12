@@ -223,8 +223,10 @@ fun SettingContent(onLogout: () -> Unit = {}) {
                     confirmPassword = ""
                     
                     // Logout and redirect to login page
-                    userSession.logout()
-                    onLogout()
+                    scope.launch {
+                        userSession.logout()
+                        onLogout()
+                    }
                 } else {
                     // Extract error message from response
                     val errorMessage = if (responseData.contains("Update failed")) {

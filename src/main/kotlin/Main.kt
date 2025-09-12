@@ -61,8 +61,10 @@ fun App() {
             "sales" -> SalesPage(
                 userSession = userSession,
                 onLogout = { 
-                    userSession.logout()
-                    currentScreen = "login" 
+                    coroutineScope.launch {
+                        userSession.logout()
+                        currentScreen = "login"
+                    }
                 }
             )
         }

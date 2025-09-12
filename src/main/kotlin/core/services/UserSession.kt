@@ -222,11 +222,26 @@ class UserSession {
         }
     }
     
-    fun logout() {
-        _sessionData = null
-        _userProfileData = null
-        _settingsData = null
-        // Keep _localSettingsData unchanged to persist until app restart
+    suspend fun logout() {
+        try {
+            // Call logout API with deviceName if session exists
+            _sessionData?.let { sessionData ->
+                val apiService = ApiService()
+                val logoutRequest = ApiService.LogoutRequest(
+                    deviceName = sessionData.deviceName
+                )
+                apiService.logout(logoutRequest)
+            }
+        } catch (e: Exception) {
+            // Continue with logout even if API call fails
+            println("Logout API call failed: ${e.message}")
+        } finally {
+            // Clear session data
+            _sessionData = null
+            _userProfileData = null
+            _settingsData = null
+            // Keep _localSettingsData unchanged to persist until app restart
+        }
     }
     
     fun getAuthHeaders(): Map<String, String> {
