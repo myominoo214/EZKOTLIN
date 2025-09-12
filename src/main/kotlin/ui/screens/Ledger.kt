@@ -375,14 +375,10 @@ fun Ledger(
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             // Header Section
-            Card(
-                modifier = Modifier
+            Column(
+                    modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(2.dp),
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     // Break Amount Input Row
@@ -414,8 +410,11 @@ fun Ledger(
                                 singleLine = true,
                                 colors = TextFieldDefaults.colors(
                                     focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    focusedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer
                                 ),
+
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(56.dp)
@@ -483,52 +482,48 @@ fun Ledger(
                     
                     // Prize Selection
                     if (state.prizes.isNotEmpty()) {
-                        Card(
-                            modifier = Modifier.fillMaxWidth()
+                        Column(
+                            modifier = Modifier.padding(2.dp).fillMaxWidth()
                         ) {
-                            Column(
-                                modifier = Modifier.padding(2.dp)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
+                                // "All" radio button (default selected)
                                 Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .horizontalScroll(rememberScrollState()),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    // "All" radio button (default selected)
+                                    RadioButton(
+                                        selected = state.selectedPrize.isEmpty(),
+                                        onClick = { state = state.copy(selectedPrize = "") }
+                                    )
+                                    Text(
+                                        text = "All",
+                                        modifier = Modifier.padding(start = 4.dp)
+                                    )
+                                }
+                                
+                                // Prize radio buttons (excluding "All")
+                                state.prizes.filter { it != "All" }.forEach { prize ->
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         RadioButton(
-                                            selected = state.selectedPrize.isEmpty(),
-                                            onClick = { state = state.copy(selectedPrize = "") }
+                                            selected = state.selectedPrize == prize,
+                                            onClick = {
+                                                state = state.copy(
+                                                    selectedPrize = prize,
+                                                    selectedUser = ""
+                                                )
+                                            }
                                         )
                                         Text(
-                                            text = "All",
+                                            text = prize,
                                             modifier = Modifier.padding(start = 4.dp)
                                         )
-                                    }
-                                    
-                                    // Prize radio buttons (excluding "All")
-                                    state.prizes.filter { it != "All" }.forEach { prize ->
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            RadioButton(
-                                                selected = state.selectedPrize == prize,
-                                                onClick = {
-                                                    state = state.copy(
-                                                        selectedPrize = prize,
-                                                        selectedUser = ""
-                                                    )
-                                                }
-                                            )
-                                            Text(
-                                                text = prize,
-                                                modifier = Modifier.padding(start = 4.dp)
-                                            )
-                                        }
                                     }
                                 }
                             }
@@ -589,7 +584,6 @@ fun Ledger(
                         }
                     }
                 }
-            }
             
             // Ledger Table
             Card(
@@ -597,7 +591,8 @@ fun Ledger(
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(top = 4.dp)
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 8.dp)
+                    .background(MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 if (ledgerStoreState.loading) {
@@ -632,7 +627,7 @@ fun Ledger(
                     )
                 }
                 Column(
-                    modifier = Modifier.padding(vertical = 2.dp,horizontal=8.dp)
+                    modifier = Modifier.background(Color(0xFFDBEAFE)) // blue-100
                 ){
                     val totalUnit = state.ledgerData.sumOf { item ->
                         val total = item.totalAmount
@@ -651,7 +646,7 @@ fun Ledger(
                     } else "0"
                     
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -671,14 +666,14 @@ fun Ledger(
                             Icon(
                                 painter = painterResource("copy_icon.svg"),
                                 contentDescription = "Copy Unit Data",
-                                tint = if (state.copiedUnit) Color.Green else MaterialTheme.colorScheme.onSecondaryContainer,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(16.dp)
                             )
                         }
                     }
                     
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -698,7 +693,7 @@ fun Ledger(
                             Icon(
                                 painter = painterResource("copy_icon.svg"),
                                 contentDescription = "Copy Extra Data",
-                                tint = if (state.copiedExtra) Color.Green else MaterialTheme.colorScheme.onSecondaryContainer,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(16.dp)
                             )
                         }
