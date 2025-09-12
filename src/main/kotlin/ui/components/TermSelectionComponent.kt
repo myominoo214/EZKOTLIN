@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -281,7 +282,7 @@ fun TermSelectionDropdown(
                     }
                 },
                 modifier = Modifier
-                    .menuAnchor()
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = !isLoading)
                     .fillMaxWidth(),
                 enabled = !isLoading
             )
@@ -422,7 +423,7 @@ fun GroupedTermAccordion(
             
             // Group content (terms) - only for multi-child groups
             if (!isSingleChild && isExpanded) {
-                Divider()
+                HorizontalDivider()
                 Column(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)

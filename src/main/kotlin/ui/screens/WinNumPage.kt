@@ -624,7 +624,7 @@ fun WinNumContent() {
                         )
                     }
                     
-                    Divider()
+                    HorizontalDivider()
                     
                     // Table Content
                     LazyColumn {
@@ -670,7 +670,7 @@ fun WinNumContent() {
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
-                            Divider()
+                            HorizontalDivider()
                         }
                         
                         // Total Row

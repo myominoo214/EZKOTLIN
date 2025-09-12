@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.res.painterResource
+
 import androidx.compose.runtime.getValue
 import io.ktor.client.HttpClient
 import data.models.UserOption
@@ -156,7 +156,7 @@ fun UsersContent() {
                 },
             ) {
                 Icon(
-                    painter = painterResource("add_user.png"),
+                    imageVector = Icons.Default.PersonAdd,
                     contentDescription = "Add User",
                     modifier = Modifier.size(18.dp),
                     tint = Color.White
@@ -359,7 +359,7 @@ fun UsersDataTable(
                 )
             }
             
-            Divider()
+            HorizontalDivider()
             
             // Table Content
             if (users.isEmpty()) {
@@ -392,7 +392,7 @@ fun UsersDataTable(
                             backgroundColor = backgroundColor
                         )
                         if (user != users.last()) {
-                            Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                         }
                     }
                 }

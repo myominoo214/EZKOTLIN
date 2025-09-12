@@ -15,9 +15,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -113,7 +113,7 @@ fun SalePageLeftContent(
                 IconButton(
                     onClick = { /* Navigate to slip page */ }
                 ) {
-                    Icon(Icons.Default.List, contentDescription = "Slips")
+                    Icon(Icons.AutoMirrored.Filled.List, contentDescription = "Slips")
                 }
             }
             
@@ -150,7 +150,7 @@ fun SalePageLeftContent(
                 IconButton(
                     onClick = { /* Navigate to slip page */ }
                 ) {
-                    Icon(Icons.Default.List, contentDescription = "List")
+                    Icon(Icons.AutoMirrored.Filled.List, contentDescription = "List")
                 }
             }
             

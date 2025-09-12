@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,7 +66,7 @@ fun fetchUsers(
                 println("[DEBUG] First user object: ${response.data?.data?.by?.get(0)}")
             }
             // Check if we have a successful response with data
-            if ((response.success == true || response.success == null) && response.data?.data?.by != null) {
+            if (response.success != false && response.data?.data?.by != null) {
                 val apiUsers = response.data?.data?.by ?: emptyList()
                 val userList = mutableListOf<UserOption>()
                 // Add "All" option at the beginning
@@ -281,7 +282,7 @@ fun UserSelectionDropdown(
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier
-                    .menuAnchor()
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true)
                     .fillMaxWidth()
                     .height(56.dp),
                 textStyle = androidx.compose.ui.text.TextStyle(fontSize = 14.sp)

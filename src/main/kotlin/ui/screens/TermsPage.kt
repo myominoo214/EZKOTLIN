@@ -41,7 +41,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.TextButton
-import androidx.compose.material.Divider
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.MaterialTheme
@@ -708,7 +709,7 @@ fun TermsContent() {
                         )
                     }
                     
-                    Divider()
+                    HorizontalDivider()
                     
                     // Table Rows
                     LazyColumn {
@@ -810,7 +811,7 @@ fun TermsContent() {
                             }
                             
                             if (terms.indexOf(term) < terms.size - 1) {
-                                Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                             }
                         }
                         }
@@ -1077,7 +1078,7 @@ fun TwoDFormLayout(
                     readOnly = true,
                     label = { Text("Number of Time Slots") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor(),
+                    modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
                     textStyle = TextStyle(fontSize = 14.sp)
                 )
                 ExposedDropdownMenu(

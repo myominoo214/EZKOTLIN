@@ -341,7 +341,10 @@ class HelperFunctions {
                 "SS" -> getSS(num, unit)
                 "MM" -> getMM(num, unit)
                 "SM" -> getSM(num, unit)
-                "MS" -> getMS(num, unit)
+                "MS" -> {
+                    if (lottType == "3D") getMidSeries(num, unit)
+                    else getMS(num, unit)
+                }
                 "P", "W" -> getPower(num, unit)
                 "K" -> getK(num, unit)
                 "B" -> {
@@ -361,9 +364,6 @@ class HelperFunctions {
                 }
                 "FS" -> {
                     if (lottType == "3D") getFrontSeries3D(num, unit)
-                }
-                "MS" -> {
-                    if (lottType == "3D") getMidSeries(num, unit)
                 }
                 "BS" -> {
                     if (lottType == "3D") getBackSeries3D(num, unit)

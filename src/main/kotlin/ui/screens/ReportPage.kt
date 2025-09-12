@@ -669,7 +669,7 @@ fun SimplifiedView(
         
         // Total Row
         subTotal?.let { total ->
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             Row(
                  modifier = Modifier
                      .fillMaxWidth()
@@ -823,7 +823,7 @@ fun StatementTable(
             }
         }
         
-        Divider()
+        HorizontalDivider()
         
         // Data Rows - Scrollable
         LazyColumn(
@@ -923,7 +923,7 @@ fun StatementTable(
                     )
                 }
             }
-            Divider()
+            HorizontalDivider()
             }
         }
     }

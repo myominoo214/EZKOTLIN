@@ -269,7 +269,7 @@ fun EditLogsContent() {
                                 TableCell(log.action, 0.15f)
                             }
                             
-                            Divider(color = Color(0xFFE5E7EB), thickness = 1.dp)
+                            HorizontalDivider(color = Color(0xFFE5E7EB), thickness = 1.dp)
                         }
                     }
                 }
@@ -395,7 +395,7 @@ fun DetailTable(data: List<LogDetailData>) {
                 TableCell(item.discount ?: "0", 0.25f)
             }
             
-            Divider(color = Color(0xFFE5E7EB), thickness = 1.dp)
+            HorizontalDivider(color = Color(0xFFE5E7EB), thickness = 1.dp)
         }
     }
 }

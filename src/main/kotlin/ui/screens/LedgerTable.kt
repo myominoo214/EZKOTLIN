@@ -243,7 +243,7 @@ fun LedgerTableComponent(
                 )
             }
             
-            Divider()
+            HorizontalDivider()
             
             // Table content
             LazyColumn(
@@ -300,7 +300,7 @@ fun LedgerTableComponent(
                     }
                     
                     if (index < sortedData.size - 1) {
-                        Divider(color = Color.Gray.copy(alpha = 0.3f))
+                        HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f))
                     }
                 }
             }
