@@ -111,6 +111,7 @@ fun SalesPage(
                 "လယ်ဂျာ" -> LedgerContent()
                 "ပြင်ဖျက်မှတ်တမ်း" -> EditLogsContent()
                 "ဖိုင်ရှင်း" -> CleanFileContent()
+                "Info" -> InfoPage()
                 "Setting" -> SettingContent(onLogout = onLogout)
                 else -> SalePage()
             }
@@ -137,7 +138,8 @@ fun Sidebar(
         MenuItem("အလျော်စာရင်း", Icons.Default.EmojiEvents) { onItemSelected("အလျော်စာရင်း") },
         MenuItem("ပြင်ဖျက်မှတ်တမ်း", Icons.Default.History) { onItemSelected("ပြင်ဖျက်မှတ်တမ်း") },
         MenuItem("ဖိုင်ရှင်း", Icons.Default.CleaningServices) { onItemSelected("ဖိုင်ရှင်း") },
-        MenuItem("Setting", Icons.Default.Settings) { onItemSelected("Setting") }
+        MenuItem("Setting", Icons.Default.Settings) { onItemSelected("Setting") },
+        MenuItem("Info", Icons.Default.Info) { onItemSelected("Info") }
     )
 
     val backgroundColor = if (isDarkTheme) Color(0xFF1E1E1E) else Color(0xFFF5F5F5)
@@ -203,24 +205,24 @@ fun Sidebar(
                     .fillMaxWidth()
                     .clickable { item.onClick() }
                     .background(
-                        color = if (isSelected) selectedColor.copy(alpha = 0.1f) else Color.Transparent,
+                        color = if (isSelected) Material3Theme.colorScheme.primary.copy(alpha = 0.5f) else Color.Transparent,
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .padding(12.dp),
+                    .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = item.icon,
                     contentDescription = item.title,
-                    tint = if (isSelected) selectedColor else textColor.copy(alpha = 0.7f),
+                    tint = if (isSelected) Material3Theme.colorScheme.primary else Material3Theme.colorScheme.onSurface.copy(alpha = 0.7f),
                     modifier = Modifier.size(20.dp)
                 )
                 
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 
                 Text(
                     text = item.title,
-                    color = if (isSelected) selectedColor else textColor,
+                    color = if (isSelected) Material3Theme.colorScheme.primary else Material3Theme.colorScheme.onSurface,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                     fontSize = 13.sp,
                     fontFamily = FontConfig.getFontFamily(item.title)
